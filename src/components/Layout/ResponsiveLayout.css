@@ -12,3 +12,143 @@
         padding: var(--spacing-md);
     }
 }
+
+/* ========================================
+   HAMBURGER MENU BUTTON
+   ======================================== */
+
+.hamburger-menu {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 1001;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--primary-color);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.hamburger-menu:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.hamburger-menu:active {
+    transform: scale(0.95);
+}
+
+.hamburger-icon {
+    font-size: 24px;
+    color: white;
+    line-height: 1;
+}
+
+/* ========================================
+   MOBILE SIDEBAR
+   ======================================== */
+
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    background: var(--card-bg);
+    z-index: 1002;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-sidebar.open {
+    left: 0;
+}
+
+.mobile-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--primary-color);
+    color: white;
+}
+
+.mobile-sidebar-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.close-sidebar {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.close-sidebar:hover {
+    transform: scale(1.1);
+}
+
+.close-sidebar:active {
+    transform: scale(0.9);
+}
+
+/* ========================================
+   SIDEBAR OVERLAY
+   ======================================== */
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+
+@media (max-width: 767px) {
+
+    /* Adjust main content padding when hamburger menu is visible */
+    .device-mobile .main-content {
+        padding-top: calc(var(--spacing-md) + 64px);
+    }
+}
+
+/* Tablet and Desktop - Hide mobile menu elements */
+@media (min-width: 768px) {
+
+    .hamburger-menu,
+    .mobile-sidebar,
+    .sidebar-overlay {
+        display: none !important;
+    }
+}

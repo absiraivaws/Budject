@@ -34,9 +34,15 @@ const navSections = [
     }
 ];
 
-export default function SideNav() {
+export default function SideNav({ onNavigate }) {
     const location = useLocation();
     const { theme, toggleTheme } = useTheme();
+
+    const handleNavClick = () => {
+        if (onNavigate) {
+            onNavigate();
+        }
+    };
 
     return (
         <aside className="side-nav">
@@ -53,6 +59,7 @@ export default function SideNav() {
                                 key={item.path}
                                 to={item.path}
                                 className={`side-nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                                onClick={handleNavClick}
                             >
                                 <span className="side-nav-icon">{item.icon}</span>
                                 <span className="side-nav-label">{item.label}</span>
@@ -69,7 +76,7 @@ export default function SideNav() {
                         {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
                     </span>
                 </button>
-                <Link to="/settings" className="side-nav-item">
+                <Link to="/settings" className="side-nav-item" onClick={handleNavClick}>
                     <span className="side-nav-icon">⚙️</span>
                     <span className="side-nav-label">Settings</span>
                 </Link>
