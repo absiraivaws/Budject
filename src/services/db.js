@@ -331,6 +331,13 @@ export async function deleteRecurring(id) {
     await db.delete('recurring', id);
 }
 
+// Function aliases for consistency
+export const getAllRecurringTransactions = getAllRecurring;
+export const addRecurringTransaction = addRecurring;
+export const updateRecurringTransaction = updateRecurring;
+export const deleteRecurringTransaction = deleteRecurring;
+
+
 // ========================================
 // ASSET & LIABILITY OPERATIONS
 // ========================================

@@ -1,0 +1,223 @@
+.recurring-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.recurring-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-xl);
+}
+
+.recurring-header h1 {
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Recurring List */
+.recurring-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.recurring-item {
+    display: flex;
+    align-items: stretch;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+    background: var(--color-bg-tertiary);
+}
+
+.recurring-item:hover {
+    background: var(--color-surface-hover);
+}
+
+.recurring-item.inactive {
+    opacity: 0.6;
+}
+
+.recurring-type-indicator {
+    width: 4px;
+    flex-shrink: 0;
+}
+
+.recurring-type-indicator.income {
+    background: var(--color-income);
+}
+
+.recurring-type-indicator.expense {
+    background: var(--color-expense);
+}
+
+.recurring-type-indicator.transfer {
+    background: var(--color-transfer);
+}
+
+.recurring-main {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+}
+
+.recurring-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.recurring-name {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-xs);
+}
+
+.recurring-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-xs);
+}
+
+.recurring-frequency {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-primary);
+}
+
+.recurring-separator {
+    color: var(--color-text-tertiary);
+}
+
+.recurring-notes {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    font-style: italic;
+    margin-top: var(--spacing-xs);
+}
+
+.recurring-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-sm);
+}
+
+.recurring-amount {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+}
+
+.recurring-amount.income {
+    color: var(--color-income);
+}
+
+.recurring-amount.expense {
+    color: var(--color-expense);
+}
+
+.recurring-amount.transfer {
+    color: var(--color-transfer);
+}
+
+.recurring-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.recurring-item:hover .recurring-actions {
+    opacity: 1;
+}
+
+.recurring-action-btn {
+    background: none;
+    border: none;
+    padding: var(--spacing-xs);
+    cursor: pointer;
+    font-size: 1.1rem;
+    opacity: 0.6;
+    transition: all var(--transition-fast);
+    border-radius: var(--radius-md);
+}
+
+.recurring-action-btn:hover {
+    opacity: 1;
+    background: var(--color-surface);
+}
+
+/* Recurring Form */
+.recurring-form {
+    padding: var(--spacing-md) 0;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-xl);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.empty-state h3 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.empty-state p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Delete Confirmation */
+.delete-confirm {
+    padding: var(--spacing-md) 0;
+}
+
+.delete-confirm p {
+    margin-bottom: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .recurring-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .recurring-main {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .recurring-right {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .recurring-actions {
+        opacity: 1;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
