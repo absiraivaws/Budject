@@ -15,7 +15,8 @@ export function formatDate(date, format = 'medium') {
         short: { month: 'short', day: 'numeric' },
         medium: { month: 'short', day: 'numeric', year: 'numeric' },
         long: { month: 'long', day: 'numeric', year: 'numeric' },
-        full: { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }
+        full: { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' },
+        monthYear: { month: 'long', year: 'numeric' }
     };
 
     return d.toLocaleDateString('en-US', options[format] || options.medium);
@@ -130,3 +131,72 @@ export function getRelativeTime(date) {
     if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
     return `${Math.floor(diffDays / 365)} years ago`;
 }
+
+/**
+ * Add months to a date
+ * @param {Date} date - Starting date
+ * @param {number} months - Number of months to add (can be negative)
+ * @returns {Date} New date
+ */
+export function addMonths(date, months) {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + months);
+    return d;
+}
+
+/**
+ * Generate calendar grid for a month
+ * @param {Date} date - Date in the month to generate calendar for
+ * @returns {Array<Array>} 2D array of calendar weeks
+ */
+export function generateCalendar(date) {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = d.getMonth();
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const calendar = [];
+    let week = [];
+
+    // Add days from previous month
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+        week.push({
+            date: new Date(year, month - 1, prevMonthLastDay - i),
+            isCurrentMonth: false
+        });
+    }
+
+    // Add days of current month
+    for (let day = 1; day <= daysInMonth; day++) {
+        week.push({
+            date: new Date(year, month, day),
+            isCurrentMonth: true
+        });
+
+        if (week.length === 7) {
+            calendar.push(week);
+            week = [];
+        }
+    }
+
+    // Add days from next month
+    if (week.length > 0) {
+        let nextMonthDay = 1;
+        while (week.length < 7) {
+            week.push({
+                date: new Date(year, month + 1, nextMonthDay),
+                isCurrentMonth: false
+            });
+            nextMonthDay++;
+        }
+        calendar.push(week);
+    }
+
+    return calendar;
+}
+
