@@ -1,0 +1,14 @@
+.device-mobile .main-content {
+    padding-bottom: calc(60px + var(--spacing-lg));
+}
+
+.device-tablet .main-content,
+.device-desktop .main-content {
+    padding: var(--spacing-xl);
+}
+
+@media (max-width: 767px) {
+    .main-content {
+        padding: var(--spacing-md);
+    }
+}

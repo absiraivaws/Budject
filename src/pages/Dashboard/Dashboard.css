@@ -1,0 +1,215 @@
+.dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.dashboard-header h1 {
+    margin: 0;
+}
+
+/* Stat Cards */
+.stat-card {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary-light);
+    border-radius: var(--radius-lg);
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.stat-value {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+}
+
+/* Accounts List */
+.accounts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.account-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.account-item:hover {
+    background: var(--color-surface-hover);
+    transform: translateX(4px);
+}
+
+.account-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.account-info {
+    flex: 1;
+}
+
+.account-name {
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: 2px;
+}
+
+.account-type {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-transform: capitalize;
+}
+
+.account-balance {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* Transactions List */
+.transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.transaction-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    position: relative;
+    padding-left: calc(var(--spacing-md) + 8px);
+}
+
+.transaction-item:hover {
+    background: var(--color-bg-tertiary);
+}
+
+.transaction-type-indicator {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 70%;
+    border-radius: 0 var(--radius-full) var(--radius-full) 0;
+}
+
+.transaction-type-indicator.income {
+    background: var(--color-income);
+}
+
+.transaction-type-indicator.expense {
+    background: var(--color-expense);
+}
+
+.transaction-type-indicator.transfer {
+    background: var(--color-transfer);
+}
+
+.transaction-info {
+    flex: 1;
+}
+
+.transaction-notes {
+    font-weight: var(--font-weight-medium);
+    margin-bottom: 2px;
+}
+
+.transaction-date {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.transaction-amount {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+}
+
+.transaction-amount.income {
+    color: var(--color-income);
+}
+
+.transaction-amount.expense {
+    color: var(--color-expense);
+}
+
+.transaction-amount.transfer {
+    color: var(--color-transfer);
+}
+
+.view-all-link {
+    display: block;
+    text-align: center;
+    padding: var(--spacing-md);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.view-all-link:hover {
+    background: var(--color-primary-light);
+    border-radius: var(--radius-md);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--color-text-secondary);
+}
+
+.empty-state p {
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+
+    .stat-value {
+        font-size: var(--font-size-xl);
+    }
+}

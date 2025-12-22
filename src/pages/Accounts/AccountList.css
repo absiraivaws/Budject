@@ -1,0 +1,200 @@
+.accounts-page {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.accounts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-xl);
+}
+
+.accounts-header h1 {
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Summary Card */
+.accounts-summary {
+    margin-bottom: var(--spacing-xl);
+}
+
+.summary-content {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.summary-icon {
+    font-size: 3rem;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary-light);
+    border-radius: var(--radius-xl);
+}
+
+.summary-info {
+    flex: 1;
+}
+
+.summary-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.summary-value {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.summary-count {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--color-primary-light);
+    border-radius: var(--radius-lg);
+}
+
+.count-number {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+}
+
+.count-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+/* Accounts Grid */
+.accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.account-card {
+    transition: all var(--transition-base);
+}
+
+.account-card:hover {
+    transform: translateY(-4px);
+}
+
+.account-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+}
+
+.account-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.account-card-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.account-action-btn {
+    background: none;
+    border: none;
+    padding: var(--spacing-xs);
+    cursor: pointer;
+    font-size: 1.2rem;
+    opacity: 0.6;
+    transition: all var(--transition-fast);
+    border-radius: var(--radius-md);
+}
+
+.account-action-btn:hover {
+    opacity: 1;
+    background: var(--color-surface-hover);
+}
+
+.account-card-body {
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border-light);
+}
+
+.account-card-name {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-xs);
+}
+
+.account-card-type {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-md);
+}
+
+.account-card-balance {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-xl);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.empty-state h3 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.empty-state p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Delete Confirmation */
+.delete-confirm {
+    padding: var(--spacing-md) 0;
+}
+
+.delete-confirm p {
+    margin-bottom: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .accounts-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .summary-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .summary-value {
+        font-size: var(--font-size-2xl);
+    }
+
+    .accounts-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,99 @@
+.side-nav {
+    display: none;
+    width: 260px;
+    height: 100vh;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border-light);
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    left: 0;
+}
+
+.side-nav-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.side-nav-logo {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    margin: 0;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.side-nav-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+}
+
+.side-nav-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.side-nav-section-title {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-sm);
+    padding: 0 var(--spacing-sm);
+}
+
+.side-nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    font-size: var(--font-size-base);
+    font-family: var(--font-family);
+}
+
+.side-nav-item:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+}
+
+.side-nav-item.active {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+}
+
+.side-nav-icon {
+    font-size: 1.25rem;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.side-nav-label {
+    flex: 1;
+}
+
+.side-nav-footer {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--color-border-light);
+}
+
+/* Show on tablet and desktop */
+@media (min-width: 768px) {
+    .side-nav {
+        display: flex;
+    }
+}

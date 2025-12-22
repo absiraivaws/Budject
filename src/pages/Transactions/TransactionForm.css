@@ -1,0 +1,109 @@
+.transaction-form {
+    max-width: 600px;
+}
+
+/* Transaction Type Tabs */
+.transaction-type-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+}
+
+.type-tab {
+    padding: var(--spacing-md);
+    background: var(--color-bg-tertiary);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    transition: all var(--transition-fast);
+}
+
+.type-tab:hover {
+    background: var(--color-surface-hover);
+}
+
+.type-tab.active {
+    font-weight: var(--font-weight-semibold);
+}
+
+.type-tab.active.expense {
+    background: var(--color-expense-light);
+    border-color: var(--color-expense);
+    color: var(--color-expense);
+}
+
+.type-tab.active.income {
+    background: var(--color-income-light);
+    border-color: var(--color-income);
+    color: var(--color-income);
+}
+
+.type-tab.active.transfer {
+    background: var(--color-transfer-light);
+    border-color: var(--color-transfer);
+    color: var(--color-transfer);
+}
+
+/* Amount Input */
+.amount-input-group {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.amount-input {
+    flex: 1;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+}
+
+.calculator-toggle-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-primary-light);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all var(--transition-fast);
+}
+
+.calculator-toggle-btn:hover {
+    background: var(--color-primary);
+    transform: scale(1.05);
+}
+
+.amount-preview {
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+}
+
+.calculator-container {
+    margin-bottom: var(--spacing-lg);
+    animation: fadeIn var(--transition-base) ease-out;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-border-light);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .transaction-type-tabs {
+        grid-template-columns: 1fr;
+    }
+
+    .type-tab {
+        padding: var(--spacing-sm);
+    }
+}

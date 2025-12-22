@@ -1,0 +1,41 @@
+import { CURRENCIES } from '../config/constants.js';
+
+/**
+ * Format amount with currency symbol
+ * @param {number} amount - Amount to format
+ * @param {string} currencyCode - Currency code (e.g., 'LKR', 'USD')
+ * @returns {string} Formatted amount
+ */
+export function formatCurrency(amount, currencyCode = 'LKR') {
+    const currency = CURRENCIES.find(c => c.code === currencyCode);
+    if (!currency) return `${amount.toFixed(2)}`;
+
+    const formattedAmount = Math.abs(amount).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    const sign = amount < 0 ? '-' : '';
+    return `${sign}${currency.symbol} ${formattedAmount}`;
+}
+
+/**
+ * Parse currency string to number
+ * @param {string} value - Currency string
+ * @returns {number} Parsed number
+ */
+export function parseCurrency(value) {
+    if (typeof value === 'number') return value;
+    const cleaned = value.replace(/[^0-9.-]/g, '');
+    return parseFloat(cleaned) || 0;
+}
+
+/**
+ * Get currency symbol
+ * @param {string} currencyCode - Currency code
+ * @returns {string} Currency symbol
+ */
+export function getCurrencySymbol(currencyCode) {
+    const currency = CURRENCIES.find(c => c.code === currencyCode);
+    return currency ? currency.symbol : '';
+}

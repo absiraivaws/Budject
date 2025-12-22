@@ -1,0 +1,87 @@
+// Application Constants
+
+export const ACCOUNT_TYPES = [
+  { id: 'cash', label: 'Cash', icon: '💵' },
+  { id: 'bank', label: 'Bank Account', icon: '🏦' },
+  { id: 'card', label: 'Credit/Debit Card', icon: '💳' },
+  { id: 'ewallet', label: 'E-Wallet', icon: '📱' },
+  { id: 'loan', label: 'Loan', icon: '💰' },
+  { id: 'savings', label: 'Savings', icon: '🏦' }
+];
+
+export const TRANSACTION_TYPES = {
+  INCOME: 'income',
+  EXPENSE: 'expense',
+  TRANSFER: 'transfer'
+};
+
+export const RECURRING_FREQUENCIES = [
+  { id: 'daily', label: 'Daily' },
+  { id: 'weekly', label: 'Weekly' },
+  { id: 'monthly', label: 'Monthly' },
+  { id: 'yearly', label: 'Yearly' }
+];
+
+export const CURRENCIES = [
+  { code: 'LKR', symbol: 'Rs.', name: 'Sri Lankan Rupee' },
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+  { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' }
+];
+
+export const DEFAULT_CURRENCY = 'LKR';
+
+export const COLOR_PALETTE = [
+  '#6366F1', // Indigo
+  '#8B5CF6', // Purple
+  '#EC4899', // Pink
+  '#EF4444', // Red
+  '#F59E0B', // Amber
+  '#10B981', // Green
+  '#14B8A6', // Teal
+  '#06B6D4', // Cyan
+  '#3B82F6', // Blue
+  '#6366F1', // Violet
+];
+
+export const ICON_SET = [
+  '💵', '💳', '🏦', '💰', '📱', '🏠', '🚗', '🍔',
+  '🛒', '⚡', '💡', '🎮', '📚', '✈️', '🏥', '🎬',
+  '🎵', '👕', '💊', '🔧', '📱', '💻', '🎓', '🏋️'
+];
+
+export const CHART_COLORS = {
+  income: 'hsl(142, 76%, 36%)',
+  expense: 'hsl(0, 84%, 60%)',
+  transfer: 'hsl(199, 89%, 48%)',
+  primary: 'hsl(250, 84%, 54%)',
+  secondary: 'hsl(280, 70%, 60%)',
+  accent: 'hsl(320, 85%, 60%)'
+};
+
+export const DATE_FORMATS = {
+  short: 'MMM DD',
+  medium: 'MMM DD, YYYY',
+  long: 'MMMM DD, YYYY',
+  full: 'dddd, MMMM DD, YYYY'
+};
+
+export const BREAKPOINTS = {
+  mobile: 768,
+  tablet: 1024,
+  desktop: 1280
+};
+
+export const DB_NAME = 'BudjectDB';
+export const DB_VERSION = 1;
+
+export const STORAGE_KEYS = {
+  THEME: 'budject_theme',
+  CURRENCY: 'budject_currency',
+  LANGUAGE: 'budject_language'
+};
