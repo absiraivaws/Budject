@@ -12,6 +12,7 @@ import CalendarView from './pages/Calendar/CalendarView.jsx';
 import RecurringManager from './pages/Recurring/RecurringManager.jsx';
 import ReportsHub from './pages/Reports/ReportsHub.jsx';
 import AssetManager from './pages/Assets/AssetManager.jsx';
+import FriendManager from './pages/Friends/FriendManager.jsx';
 import Settings from './pages/Settings/Settings.jsx';
 import { initDB } from './services/db.js';
 import { initializeTheme } from './services/storageService.js';
@@ -39,6 +40,7 @@ function App() {
               <Route path="/recurring" element={<RecurringManager />} />
               <Route path="/reports" element={<ReportsHub />} />
               <Route path="/assets" element={<AssetManager />} />
+              <Route path="/friends" element={<FriendManager />} />
               <Route path="/settings" element={<Settings />} />
             </Routes>
           </ResponsiveLayout>
