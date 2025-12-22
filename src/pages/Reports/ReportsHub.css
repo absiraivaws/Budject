@@ -1,0 +1,228 @@
+.reports-page {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.reports-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-xl);
+}
+
+.reports-header h1 {
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Date Range Selector */
+.date-range-selector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.date-range-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.date-range-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--color-border);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    transition: all var(--transition-fast);
+}
+
+.date-range-btn:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+}
+
+.date-range-btn.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.custom-date-range {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.custom-date-range input {
+    flex: 1;
+}
+
+/* Summary Cards */
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-tertiary);
+}
+
+.stat-icon.income-icon {
+    background: linear-gradient(135deg, hsla(142, 76%, 36%, 0.2), hsla(142, 76%, 36%, 0.1));
+}
+
+.stat-icon.expense-icon {
+    background: linear-gradient(135deg, hsla(0, 84%, 60%, 0.2), hsla(0, 84%, 60%, 0.1));
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.stat-value {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+}
+
+/* Charts */
+.chart-container {
+    height: 300px;
+    padding: var(--spacing-md);
+}
+
+.empty-chart {
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+}
+
+/* Category List */
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.category-item-report {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.category-item-report:hover {
+    background: var(--color-surface-hover);
+}
+
+.category-info-report {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.category-icon-report {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    border-radius: var(--radius-md);
+}
+
+.category-name-report {
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-xs);
+}
+
+.category-count {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.category-amount-report {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+}
+
+.empty-list {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--color-text-secondary);
+}
+
+/* Grid Layouts */
+.grid {
+    display: grid;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .reports-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .date-range-buttons {
+        flex-direction: column;
+    }
+
+    .date-range-btn {
+        width: 100%;
+    }
+
+    .custom-date-range {
+        flex-direction: column;
+    }
+
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+}
