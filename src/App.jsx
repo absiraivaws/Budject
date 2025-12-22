@@ -21,8 +21,17 @@ import './App.css';
 function App() {
   useEffect(() => {
     // Initialize database and theme on app load
-    initDB();
-    initializeTheme();
+    const initialize = async () => {
+      try {
+        await initDB();
+        initializeTheme();
+        console.log('App initialized successfully');
+      } catch (error) {
+        console.error('Error initializing app:', error);
+      }
+    };
+
+    initialize();
   }, []);
 
   return (

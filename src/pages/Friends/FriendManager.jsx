@@ -9,9 +9,9 @@ import {
     deleteFriend,
     getAllTransactions,
     addTransaction,
-    getAllAccounts
+    getAllAccounts,
+    addLedgerEntry
 } from '../../services/db.js';
-import { addLedgerEntry } from '../../services/ledgerService.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
 import { formatDate } from '../../utils/dateUtils.js';
@@ -157,8 +157,8 @@ export default function FriendManager() {
             amount: amount,
             account_id: transactionData.account_id,
             date: transactionData.date,
-            notes: `${isLending ? 'Lent to' : 'Borrowed from'} ${selectedFriend.name}${transactionData.notes ? ': ' + transactionData.notes : ''}`,
-            tags: [`friend:${selectedFriend.id}`, isLending ? 'lending' : 'borrowing'],
+            notes: `${isLending ? 'Lent to' : 'Borrowed from'} ${selectedFriend.name}${transactionData.notes ? ': ' + transactionData.notes : ''} `,
+            tags: [`friend:${selectedFriend.id} `, isLending ? 'lending' : 'borrowing'],
             friend_id: selectedFriend.id,
             due_date: transactionData.due_date || null
         });
@@ -172,7 +172,7 @@ export default function FriendManager() {
                 type: 'debit',
                 amount: amount,
                 date: transactionData.date,
-                description: `Lent to ${selectedFriend.name}`
+                description: `Lent to ${selectedFriend.name} `
             });
 
             // Credit: Cash/Bank (asset decreases)
@@ -182,7 +182,7 @@ export default function FriendManager() {
                 type: 'credit',
                 amount: amount,
                 date: transactionData.date,
-                description: `Lent to ${selectedFriend.name}`
+                description: `Lent to ${selectedFriend.name} `
             });
         } else {
             // Debit: Cash/Bank (asset increases)
@@ -192,7 +192,7 @@ export default function FriendManager() {
                 type: 'debit',
                 amount: amount,
                 date: transactionData.date,
-                description: `Borrowed from ${selectedFriend.name}`
+                description: `Borrowed from ${selectedFriend.name} `
             });
 
             // Credit: Friend (liability increases)
@@ -202,7 +202,7 @@ export default function FriendManager() {
                 type: 'credit',
                 amount: amount,
                 date: transactionData.date,
-                description: `Borrowed from ${selectedFriend.name}`
+                description: `Borrowed from ${selectedFriend.name} `
             });
         }
 
@@ -237,7 +237,7 @@ export default function FriendManager() {
 
     const getAccountName = (accountId) => {
         const account = accounts.find(a => a.id === accountId);
-        return account ? `${account.icon} ${account.name}` : 'Unknown';
+        return account ? `${account.icon} ${account.name} ` : 'Unknown';
     };
 
     const totalLent = friends.reduce((sum, f) => sum + (f.total_lent || 0), 0);
@@ -283,7 +283,7 @@ export default function FriendManager() {
                         <div className="stat-icon">💰</div>
                         <div className="stat-content">
                             <div className="stat-label">Net Balance</div>
-                            <div className={`stat-value ${netBalance >= 0 ? 'text-success' : 'text-danger'}`}>
+                            <div className={`stat - value ${netBalance >= 0 ? 'text-success' : 'text-danger'} `}>
                                 {formatCurrency(netBalance, currency)}
                             </div>
                         </div>
@@ -292,7 +292,7 @@ export default function FriendManager() {
             </div>
 
             {/* Friends List */}
-            <Card title={`Friends (${friends.length})`}>
+            <Card title={`Friends(${friends.length})`}>
                 {friends.length === 0 ? (
                     <div className="empty-state">
                         <div className="empty-icon">👥</div>
@@ -329,7 +329,7 @@ export default function FriendManager() {
                                         </div>
                                         <div className="friend-stat">
                                             <span className="friend-stat-label">Balance:</span>
-                                            <span className={`friend-stat-value ${(friend.balance || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
+                                            <span className={`friend - stat - value ${(friend.balance || 0) >= 0 ? 'text-success' : 'text-danger'} `}>
                                                 {formatCurrency(friend.balance || 0, currency)}
                                             </span>
                                         </div>
@@ -429,21 +429,21 @@ export default function FriendManager() {
                     setIsTransactionModalOpen(false);
                     setSelectedFriend(null);
                 }}
-                title={`Transaction with ${selectedFriend?.name}`}
+                title={`Transaction with ${selectedFriend?.name} `}
                 size="md"
             >
                 <div className="friend-form">
                     <div className="transaction-type-tabs">
                         <button
                             type="button"
-                            className={`type-tab ${transactionData.type === 'lend' ? 'active lend' : ''}`}
+                            className={`type - tab ${transactionData.type === 'lend' ? 'active lend' : ''} `}
                             onClick={() => handleTransactionChange('type', 'lend')}
                         >
                             📤 I Lent
                         </button>
                         <button
                             type="button"
-                            className={`type-tab ${transactionData.type === 'borrow' ? 'active borrow' : ''}`}
+                            className={`type - tab ${transactionData.type === 'borrow' ? 'active borrow' : ''} `}
                             onClick={() => handleTransactionChange('type', 'borrow')}
                         >
                             📥 I Borrowed
