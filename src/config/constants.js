@@ -1,13 +1,38 @@
 // Application Constants
 
 export const ACCOUNT_TYPES = [
-  { id: 'cash', label: 'Cash', icon: '💵' },
-  { id: 'bank', label: 'Bank Account', icon: '🏦' },
-  { id: 'card', label: 'Credit Card', icon: '💳' },
-  { id: 'ewallet', label: 'E-Wallet', icon: '📱' },
-  { id: 'loan', label: 'Loan', icon: '💰' },
-  { id: 'savings', label: 'Savings', icon: '🏦' }
+  { id: 'cash', label: 'Cash', icon: '💵', hasInterest: false },
+  { id: 'bank', label: 'Bank Account', icon: '🏦', hasInterest: false },
+  { id: 'savings', label: 'Savings Account', icon: '💎', hasInterest: true },
+  { id: 'current', label: 'Current Account', icon: '🏛️', hasInterest: false },
+  { id: 'fixed_deposit', label: 'Fixed Deposit', icon: '📊', hasInterest: true },
+  { id: 'card', label: 'Credit Card', icon: '💳', hasInterest: true },
+  { id: 'ewallet', label: 'E-Wallet', icon: '📱', hasInterest: false },
+  { id: 'loan', label: 'Loan', icon: '💰', hasInterest: true }
 ];
+
+export const LOAN_TYPES = [
+  { id: 'bank_loan', label: 'Bank Loan', icon: '🏦' },
+  { id: 'leasing', label: 'Leasing', icon: '🚗' },
+  { id: 'pawning', label: 'Pawning', icon: '💍' },
+  { id: 'friends', label: 'Friends', icon: '👥' },
+  { id: 'private', label: 'Private', icon: '🤝' }
+];
+
+export const INTEREST_FREQUENCIES = [
+  { id: 'daily', label: 'Daily' },
+  { id: 'weekly', label: 'Weekly' },
+  { id: 'monthly', label: 'Monthly' },
+  { id: 'annually', label: 'Annually' }
+];
+
+export const FD_PAYOUT_TYPES = [
+  { id: 'maturity', label: 'At Maturity' },
+  { id: 'monthly', label: 'Monthly' },
+  { id: 'quarterly', label: 'Quarterly' },
+  { id: 'annually', label: 'Annually' }
+];
+
 
 export const TRANSACTION_TYPES = {
   INCOME: 'income',
@@ -78,7 +103,7 @@ export const BREAKPOINTS = {
 };
 
 export const DB_NAME = 'BudjectDB';
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 export const STORAGE_KEYS = {
   THEME: 'budject_theme',

@@ -63,6 +63,12 @@ export async function initDB() {
             if (!db.objectStoreNames.contains('liabilities')) {
                 db.createObjectStore('liabilities', { keyPath: 'id' });
             }
+
+            // Friends Store (for friend fund management)
+            if (!db.objectStoreNames.contains('friends')) {
+                const friendsStore = db.createObjectStore('friends', { keyPath: 'id' });
+                friendsStore.createIndex('name', 'name');
+            }
         }
     });
 
@@ -369,6 +375,49 @@ export async function addLiability(liability) {
 }
 
 // ========================================
+// FRIEND FUND OPERATIONS
+// ========================================
+
+export async function getAllFriends() {
+    const db = await getDB();
+    return await db.getAll('friends');
+}
+
+export async function getFriend(id) {
+    const db = await getDB();
+    return await db.get('friends', id);
+}
+
+export async function addFriend(friend) {
+    const db = await getDB();
+    const id = `friend_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const newFriend = {
+        ...friend,
+        id,
+        total_lent: 0,
+        total_borrowed: 0,
+        balance: 0,
+        created_at: new Date().toISOString()
+    };
+    await db.add('friends', newFriend);
+    return newFriend;
+}
+
+export async function updateFriend(id, updates) {
+    const db = await getDB();
+    const friend = await db.get('friends', id);
+    if (!friend) throw new Error('Friend not found');
+    const updatedFriend = { ...friend, ...updates, updated_at: new Date().toISOString() };
+    await db.put('friends', updatedFriend);
+    return updatedFriend;
+}
+
+export async function deleteFriend(id) {
+    const db = await getDB();
+    await db.delete('friends', id);
+}
+
+// ========================================
 // DATA MANAGEMENT
 // ========================================
 
@@ -383,6 +432,7 @@ export async function exportAllData() {
         recurring: await db.getAll('recurring'),
         assets: await db.getAll('assets'),
         liabilities: await db.getAll('liabilities'),
+        friends: await db.getAll('friends'),
         exported_at: new Date().toISOString()
     };
     return data;
@@ -391,7 +441,7 @@ export async function exportAllData() {
 export async function importData(data) {
     const db = await getDB();
 
-    const stores = ['accounts', 'transactions', 'ledger', 'categories', 'budgets', 'recurring', 'assets', 'liabilities'];
+    const stores = ['accounts', 'transactions', 'ledger', 'categories', 'budgets', 'recurring', 'assets', 'liabilities', 'friends'];
 
     for (const storeName of stores) {
         if (data[storeName] && Array.isArray(data[storeName])) {
@@ -406,7 +456,7 @@ export async function importData(data) {
 
 export async function clearAllData() {
     const db = await getDB();
-    const stores = ['accounts', 'transactions', 'ledger', 'categories', 'budgets', 'recurring', 'assets', 'liabilities'];
+    const stores = ['accounts', 'transactions', 'ledger', 'categories', 'budgets', 'recurring', 'assets', 'liabilities', 'friends'];
 
     for (const storeName of stores) {
         await db.clear(storeName);
