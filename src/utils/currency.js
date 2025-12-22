@@ -4,16 +4,27 @@ import { CURRENCIES } from '../config/constants.js';
  * Format amount with currency symbol
  * @param {number} amount - Amount to format
  * @param {string} currencyCode - Currency code (e.g., 'LKR', 'USD')
+ * @param {boolean} compact - Use compact format (e.g., 1.2K instead of 1,200.00)
  * @returns {string} Formatted amount
  */
-export function formatCurrency(amount, currencyCode = 'LKR') {
+export function formatCurrency(amount, currencyCode = 'LKR', compact = false) {
     const currency = CURRENCIES.find(c => c.code === currencyCode);
     if (!currency) return `${amount.toFixed(2)}`;
 
-    const formattedAmount = Math.abs(amount).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
+    let formattedAmount;
+    if (compact && Math.abs(amount) >= 1000) {
+        const absAmount = Math.abs(amount);
+        if (absAmount >= 1000000) {
+            formattedAmount = (absAmount / 1000000).toFixed(1) + 'M';
+        } else {
+            formattedAmount = (absAmount / 1000).toFixed(1) + 'K';
+        }
+    } else {
+        formattedAmount = Math.abs(amount).toLocaleString('en-US', {
+            minimumFractionDigits: compact ? 0 : 2,
+            maximumFractionDigits: compact ? 0 : 2
+        });
+    }
 
     const sign = amount < 0 ? '-' : '';
     return `${sign}${currency.symbol} ${formattedAmount}`;

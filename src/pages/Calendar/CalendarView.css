@@ -1,0 +1,246 @@
+.calendar-page {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.calendar-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.calendar-header h1 {
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Calendar Navigation */
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.calendar-month-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.calendar-month-title h2 {
+    margin: 0;
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--color-border-light);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.calendar-day-header {
+    background: var(--color-bg-tertiary);
+    padding: var(--spacing-sm);
+    text-align: center;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.calendar-day {
+    background: var(--color-surface);
+    min-height: 100px;
+    padding: var(--spacing-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    position: relative;
+}
+
+.calendar-day:hover {
+    background: var(--color-surface-hover);
+}
+
+.calendar-day.other-month {
+    background: var(--color-bg-tertiary);
+    opacity: 0.5;
+    cursor: default;
+}
+
+.calendar-day.other-month:hover {
+    background: var(--color-bg-tertiary);
+}
+
+.calendar-day.today {
+    background: var(--color-primary-light);
+    border: 2px solid var(--color-primary);
+}
+
+.calendar-day.selected {
+    background: var(--color-primary-light);
+    box-shadow: inset 0 0 0 2px var(--color-primary);
+}
+
+.calendar-day.has-transactions {
+    font-weight: var(--font-weight-medium);
+}
+
+.calendar-day-number {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-xs);
+}
+
+.calendar-day-totals {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: var(--font-size-xs);
+    margin-top: var(--spacing-xs);
+}
+
+.calendar-day-income {
+    color: var(--color-income);
+    font-weight: var(--font-weight-medium);
+}
+
+.calendar-day-expense {
+    color: var(--color-expense);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Empty State */
+.empty-state-small {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--color-text-secondary);
+}
+
+/* Transactions List (reuse from TransactionList) */
+.transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.transaction-item {
+    display: flex;
+    align-items: stretch;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+.transaction-item:hover {
+    background: var(--color-bg-tertiary);
+}
+
+.transaction-type-indicator {
+    width: 4px;
+    flex-shrink: 0;
+}
+
+.transaction-type-indicator.income {
+    background: var(--color-income);
+}
+
+.transaction-type-indicator.expense {
+    background: var(--color-expense);
+}
+
+.transaction-type-indicator.transfer {
+    background: var(--color-transfer);
+}
+
+.transaction-main {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+}
+
+.transaction-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.transaction-description {
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--spacing-xs);
+}
+
+.transaction-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+}
+
+.transaction-separator {
+    color: var(--color-text-tertiary);
+}
+
+.transaction-amount {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+}
+
+.transaction-amount.income {
+    color: var(--color-income);
+}
+
+.transaction-amount.expense {
+    color: var(--color-expense);
+}
+
+.transaction-amount.transfer {
+    color: var(--color-transfer);
+}
+
+/* Responsive */
+@media (max-width: 1023px) {
+    .calendar-day {
+        min-height: 80px;
+        padding: var(--spacing-xs);
+    }
+
+    .calendar-day-totals {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .calendar-nav {
+        flex-direction: column;
+    }
+
+    .calendar-month-title {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .calendar-day {
+        min-height: 60px;
+        padding: 4px;
+    }
+
+    .calendar-day-number {
+        font-size: var(--font-size-sm);
+    }
+
+    .calendar-day-totals {
+        font-size: 0.6rem;
+    }
+
+    .transaction-main {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
