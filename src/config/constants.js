@@ -3,7 +3,7 @@
 export const ACCOUNT_TYPES = [
   { id: 'cash', label: 'Cash', icon: '💵' },
   { id: 'bank', label: 'Bank Account', icon: '🏦' },
-  { id: 'card', label: 'Credit/Debit Card', icon: '💳' },
+  { id: 'card', label: 'Credit Card', icon: '💳' },
   { id: 'ewallet', label: 'E-Wallet', icon: '📱' },
   { id: 'loan', label: 'Loan', icon: '💰' },
   { id: 'savings', label: 'Savings', icon: '🏦' }
