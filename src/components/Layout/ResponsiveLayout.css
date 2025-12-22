@@ -135,6 +135,21 @@
    RESPONSIVE ADJUSTMENTS
    ======================================== */
 
+/* Show SideNav inside mobile sidebar */
+.mobile-sidebar .side-nav {
+    display: flex !important;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    position: static;
+    background: transparent;
+}
+
+/* Hide the duplicate header in mobile sidebar */
+.mobile-sidebar .side-nav-header {
+    display: none;
+}
+
 @media (max-width: 767px) {
 
     /* Adjust main content padding when hamburger menu is visible */
