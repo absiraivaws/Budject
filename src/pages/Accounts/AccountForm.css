@@ -8,6 +8,16 @@
     gap: var(--spacing-md);
 }
 
+.form-section-title {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary);
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 2px solid var(--color-primary);
+}
+
 .form-actions {
     display: flex;
     gap: var(--spacing-md);
