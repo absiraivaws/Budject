@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
 import { useTheme } from '../../context/ThemeContext.jsx';
+import { useFontSize } from '../../context/FontSizeContext.jsx';
 import Card from '../../components/UI/Card.jsx';
 import Button from '../../components/UI/Button.jsx';
 import Modal from '../../components/UI/Modal.jsx';
@@ -11,6 +12,7 @@ import './Settings.css';
 export default function Settings() {
     const { currency, setCurrency } = useCurrency();
     const { theme, toggleTheme } = useTheme();
+    const { fontSize, setFontSize, fontSizes, currentSize } = useFontSize();
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const [importStatus, setImportStatus] = useState(null);
 
@@ -79,6 +81,39 @@ export default function Settings() {
                         <Button variant="secondary" onClick={toggleTheme}>
                             {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
                         </Button>
+                    </div>
+
+                    <div className="setting-item">
+                        <div className="setting-info">
+                            <div className="setting-label">Font Size</div>
+                            <div className="setting-description">
+                                Adjust text size for better readability (Current: {currentSize.label} - {currentSize.scale})
+                            </div>
+                        </div>
+                        <div className="font-size-control">
+                            <input
+                                type="range"
+                                min="0"
+                                max="3"
+                                value={Object.keys(fontSizes).indexOf(fontSize)}
+                                onChange={(e) => {
+                                    const keys = Object.keys(fontSizes);
+                                    setFontSize(keys[e.target.value]);
+                                }}
+                                className="font-size-slider"
+                            />
+                            <div className="font-size-labels">
+                                {Object.entries(fontSizes).map(([key, value]) => (
+                                    <button
+                                        key={key}
+                                        className={`font-size-option ${fontSize === key ? 'active' : ''}`}
+                                        onClick={() => setFontSize(key)}
+                                    >
+                                        {value.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </Card>
