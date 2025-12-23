@@ -21,7 +21,7 @@
     position: fixed;
     top: 16px;
     left: 16px;
-    z-index: 1001;
+    z-index: 1102;
     width: 48px;
     height: 48px;
     border-radius: 12px;
@@ -60,15 +60,21 @@
     left: -280px;
     width: 280px;
     height: 100vh;
-    background: var(--card-bg);
-    z-index: 1002;
-    transition: left 0.3s ease;
+    height: 100dvh;
+    /* Use dynamic viewport height for better mobile support */
+    background: var(--color-surface);
+    z-index: 1101;
+    transition: transform 0.3s ease;
+    transform: translateX(0);
     overflow-y: auto;
+    overflow-x: hidden;
     box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
 }
 
 .mobile-sidebar.open {
-    left: 0;
+    transform: translateX(280px);
 }
 
 .mobile-sidebar-header {
@@ -116,8 +122,12 @@
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    /* Use dynamic viewport height */
     background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    z-index: 1100;
     animation: fadeIn 0.3s ease;
 }
 
@@ -139,10 +149,12 @@
 .mobile-sidebar .side-nav {
     display: flex !important;
     width: 100%;
-    height: auto;
+    height: calc(100% - 61px);
+    /* Account for mobile-sidebar-header */
     border-right: none;
     position: static;
     background: transparent;
+    overflow-y: auto;
 }
 
 /* Hide the duplicate header in mobile sidebar */
