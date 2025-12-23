@@ -211,9 +211,6 @@ export default function BudgetManager() {
                         <div className="empty-icon">💰</div>
                         <h3>No budgets for this month</h3>
                         <p>Create your first budget to start tracking your spending</p>
-                        <Button variant="primary" onClick={handleAdd}>
-                            Create Budget
-                        </Button>
                     </div>
                 ) : (
                     <div className="budgets-list">

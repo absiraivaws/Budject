@@ -271,9 +271,6 @@ export default function TransactionList() {
                         <div className="empty-icon">💳</div>
                         <h3>No transactions found</h3>
                         <p>Add your first transaction to start tracking your finances</p>
-                        <Button variant="primary" onClick={handleAdd}>
-                            Add Transaction
-                        </Button>
                     </div>
                 ) : (
                     <div className="transactions-list">

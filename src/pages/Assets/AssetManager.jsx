@@ -220,9 +220,6 @@ export default function AssetManager() {
                             <div className="empty-icon">📦</div>
                             <h3>No assets tracked yet</h3>
                             <p>Start tracking your assets to monitor your net worth</p>
-                            <Button variant="primary" onClick={handleAddAsset}>
-                                Add Your First Asset
-                            </Button>
                         </div>
                     ) : (
                         <div className="asset-grid">
@@ -272,9 +269,6 @@ export default function AssetManager() {
                             <div className="empty-icon">📋</div>
                             <h3>No liabilities tracked yet</h3>
                             <p>Track your debts and loans to get a complete financial picture</p>
-                            <Button variant="primary" onClick={handleAddLiability}>
-                                Add Your First Liability
-                            </Button>
                         </div>
                     ) : (
                         <div className="asset-grid">

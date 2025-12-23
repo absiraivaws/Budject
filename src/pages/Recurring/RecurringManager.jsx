@@ -212,9 +212,6 @@ export default function RecurringManager() {
                         <div className="empty-icon">🔄</div>
                         <h3>No active recurring transactions</h3>
                         <p>Create recurring transactions for regular income and expenses</p>
-                        <Button variant="primary" onClick={handleAdd}>
-                            Create Recurring Transaction
-                        </Button>
                     </div>
                 ) : (
                     <div className="recurring-list">
