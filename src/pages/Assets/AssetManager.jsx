@@ -6,6 +6,7 @@ import { getAllAssets, addAsset, getAllLiabilities, addLiability, getAllAccounts
 import { formatCurrency } from '../../utils/currency.js';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
 import { formatDate } from '../../utils/dateUtils.js';
+import { ACCOUNT_TYPES } from '../../config/constants.js';
 import './AssetManager.css';
 
 const ASSET_TYPES = [
@@ -55,8 +56,47 @@ export default function AssetManager() {
             getAllAccounts()
         ]);
 
-        setAssets(assetsData);
-        setLiabilities(liabilitiesData);
+        // Categorize accounts as assets or liabilities
+        const accountAssets = [];
+        const accountLiabilities = [];
+
+        accountsData.forEach(account => {
+            const accountType = account.type;
+            const balance = account.balance || 0;
+
+            // Determine if account is a liability or asset
+            const isLiability = accountType === 'loan' ||
+                (accountType === 'current' && balance < 0) ||
+                accountType === 'card';
+
+            const accountItem = {
+                id: account.id,
+                name: account.name,
+                type: accountType,
+                value: Math.abs(balance),
+                current_value: Math.abs(balance),
+                icon: account.icon,
+                notes: `Account: ${account.name}`,
+                purchase_date: account.created_at || new Date().toISOString(),
+                linked_account_id: account.id,
+                is_account: true // Flag to identify account-based items
+            };
+
+            if (isLiability) {
+                // For loans, use utilized_amount if available
+                if (accountType === 'loan' && account.utilized_amount !== undefined) {
+                    accountItem.value = account.utilized_amount;
+                    accountItem.current_value = account.utilized_amount;
+                }
+                accountLiabilities.push(accountItem);
+            } else {
+                accountAssets.push(accountItem);
+            }
+        });
+
+        // Combine manual assets/liabilities with account-based ones
+        setAssets([...assetsData, ...accountAssets]);
+        setLiabilities([...liabilitiesData, ...accountLiabilities]);
         setAccounts(accountsData);
     }
 
@@ -135,7 +175,17 @@ export default function AssetManager() {
     const totalLiabilities = liabilities.reduce((sum, liability) => sum + (liability.current_value || liability.value), 0);
     const netWorth = totalAssets - totalLiabilities;
 
-    const getTypeInfo = (type, isAsset) => {
+    const getTypeInfo = (type, isAsset, item) => {
+        // Check if this is an account-based item
+        if (item?.is_account) {
+            // Import ACCOUNT_TYPES from constants
+            const accountType = ACCOUNT_TYPES.find(t => t.id === type);
+            if (accountType) {
+                return { id: type, label: accountType.label, icon: accountType.icon };
+            }
+        }
+
+        // Otherwise use the manual asset/liability types
         const types = isAsset ? ASSET_TYPES : LIABILITY_TYPES;
         return types.find(t => t.id === type) || types[0];
     };
@@ -224,7 +274,7 @@ export default function AssetManager() {
                     ) : (
                         <div className="asset-grid">
                             {assets.map(asset => {
-                                const typeInfo = getTypeInfo(asset.type, true);
+                                const typeInfo = getTypeInfo(asset.type, true, asset);
                                 const linkedAccount = getAccountName(asset.linked_account_id);
 
                                 return (
@@ -273,7 +323,7 @@ export default function AssetManager() {
                     ) : (
                         <div className="asset-grid">
                             {liabilities.map(liability => {
-                                const typeInfo = getTypeInfo(liability.type, false);
+                                const typeInfo = getTypeInfo(liability.type, false, liability);
                                 const linkedAccount = getAccountName(liability.linked_account_id);
 
                                 return (

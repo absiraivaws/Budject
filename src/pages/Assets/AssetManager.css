@@ -136,6 +136,9 @@
     font-weight: var(--font-weight-bold);
     color: var(--color-success);
     white-space: nowrap;
+    align-self: flex-start;
+    min-width: fit-content;
+    text-align: right;
 }
 
 /* Asset Form */
