@@ -51,9 +51,6 @@ export default function Dashboard() {
         <div className="dashboard fade-in">
             <div className="dashboard-header">
                 <h1>Dashboard</h1>
-                <Link to="/transactions/new">
-                    <Button variant="primary">+ Add Transaction</Button>
-                </Link>
             </div>
 
             {/* Stats Cards */}
@@ -123,9 +120,6 @@ export default function Dashboard() {
                 {transactions.length === 0 ? (
                     <div className="empty-state">
                         <p>No transactions yet. Add your first transaction!</p>
-                        <Link to="/transactions/new">
-                            <Button variant="primary">Add Transaction</Button>
-                        </Link>
                     </div>
                 ) : (
                     <div className="transactions-list">

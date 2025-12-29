@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Card from '../../components/UI/Card.jsx';
 import Button from '../../components/UI/Button.jsx';
 import Modal from '../../components/UI/Modal.jsx';
 import TransactionForm from './TransactionForm.jsx';
-import { getAllTransactions, deleteTransaction, getAllAccounts, getAllCategories } from '../../services/db.js';
+import { getAllTransactions, deleteTransaction, getAllAccounts, getAllCategories, getAllRecurringTransactions } from '../../services/db.js';
 import { reverseLedgerEntries } from '../../services/ledgerService.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { formatDate, getStartOfMonth, getEndOfMonth } from '../../utils/dateUtils.js';
@@ -15,10 +15,12 @@ import './TransactionList.css';
 export default function TransactionList() {
     const { currency } = useCurrency();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [transactions, setTransactions] = useState([]);
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [accounts, setAccounts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [recurringTransactions, setRecurringTransactions] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
 
@@ -26,6 +28,8 @@ export default function TransactionList() {
         type: 'all',
         account: 'all',
         category: 'all',
+        recurring: 'all',
+        recurringId: '',
         search: '',
         dateFrom: getStartOfMonth().toISOString().split('T')[0],
         dateTo: getEndOfMonth().toISOString().split('T')[0]
@@ -39,16 +43,26 @@ export default function TransactionList() {
         applyFilters();
     }, [transactions, filters]);
 
+    // Handle URL parameters for filtering
+    useEffect(() => {
+        const recurringId = searchParams.get('recurringId');
+        if (recurringId) {
+            setFilters(prev => ({ ...prev, recurringId, recurring: 'all' }));
+        }
+    }, [searchParams]);
+
     async function loadData() {
-        const [txData, accountsData, categoriesData] = await Promise.all([
+        const [txData, accountsData, categoriesData, recurringData] = await Promise.all([
             getAllTransactions(),
             getAllAccounts(),
-            getAllCategories()
+            getAllCategories(),
+            getAllRecurringTransactions()
         ]);
 
         setTransactions(txData);
         setAccounts(accountsData);
         setCategories(categoriesData);
+        setRecurringTransactions(recurringData);
     }
 
     function applyFilters() {
@@ -69,6 +83,18 @@ export default function TransactionList() {
         // Category filter
         if (filters.category !== 'all') {
             filtered = filtered.filter(tx => tx.category_id === filters.category);
+        }
+
+        // Recurring filter
+        if (filters.recurring === 'recurring') {
+            filtered = filtered.filter(tx => tx.is_auto_generated === true);
+        } else if (filters.recurring === 'manual') {
+            filtered = filtered.filter(tx => !tx.is_auto_generated);
+        }
+
+        // Specific recurring ID filter
+        if (filters.recurringId) {
+            filtered = filtered.filter(tx => tx.recurring_id === filters.recurringId);
         }
 
         // Search filter
@@ -243,6 +269,19 @@ export default function TransactionList() {
                     </div>
 
                     <div className="form-group">
+                        <label className="form-label">Source</label>
+                        <select
+                            className="form-select"
+                            value={filters.recurring}
+                            onChange={(e) => handleFilterChange('recurring', e.target.value)}
+                        >
+                            <option value="all">All Transactions</option>
+                            <option value="recurring">🔄 Recurring Only</option>
+                            <option value="manual">✍️ Manual Only</option>
+                        </select>
+                    </div>
+
+                    <div className="form-group">
                         <label className="form-label">From Date</label>
                         <input
                             type="date"
@@ -282,6 +321,14 @@ export default function TransactionList() {
                                     <div className="transaction-info">
                                         <div className="transaction-description">
                                             {tx.notes || 'No description'}
+                                            {tx.is_auto_generated && (
+                                                <span
+                                                    className="recurring-badge"
+                                                    title="Auto-generated from recurring transaction"
+                                                >
+                                                    🔄
+                                                </span>
+                                            )}
                                         </div>
                                         <div className="transaction-meta">
                                             <span className="transaction-date">{formatDate(tx.date, 'medium')}</span>
@@ -297,6 +344,18 @@ export default function TransactionList() {
                                                 <>
                                                     <span className="transaction-separator">→</span>
                                                     <span className="transaction-account">{getAccountName(tx.to_account_id)}</span>
+                                                </>
+                                            )}
+                                            {tx.recurring_id && (
+                                                <>
+                                                    <span className="transaction-separator">•</span>
+                                                    <button
+                                                        className="view-recurring-link"
+                                                        onClick={() => navigate(`/recurring?highlight=${tx.recurring_id}`)}
+                                                        title="View recurring rule"
+                                                    >
+                                                        View Rule
+                                                    </button>
                                                 </>
                                             )}
                                         </div>

@@ -116,6 +116,40 @@
     font-weight: var(--font-weight-medium);
 }
 
+/* Recurring Badge */
+.recurring-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: var(--spacing-sm);
+    font-size: 1rem;
+    cursor: help;
+    opacity: 0.8;
+    transition: opacity var(--transition-fast);
+}
+
+.recurring-badge:hover {
+    opacity: 1;
+}
+
+/* View Recurring Link */
+.view-recurring-link {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    padding: 2px var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.view-recurring-link:hover {
+    background: var(--color-primary-light);
+    text-decoration: underline;
+}
+
+
 .transaction-actions {
     display: flex;
     align-items: center;

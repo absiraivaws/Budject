@@ -14,7 +14,8 @@ const navSections = [
         items: [
             { path: '/transactions', icon: '💳', label: 'All Transactions' },
             { path: '/accounts', icon: '🏦', label: 'Accounts' },
-            { path: '/categories', icon: '📁', label: 'Categories' }
+            { path: '/categories', icon: '📁', label: 'Categories' },
+            { path: '/friends', icon: '👥', label: 'Friends' }
         ]
     },
     {
@@ -47,7 +48,7 @@ export default function SideNav({ onNavigate }) {
     return (
         <aside className="side-nav">
             <div className="side-nav-header">
-                <h2 className="side-nav-logo">💰 Budject</h2>
+                <h2 className="side-nav-logo">💰 Spendex</h2>
             </div>
 
             <nav className="side-nav-content">
@@ -70,12 +71,6 @@ export default function SideNav({ onNavigate }) {
             </nav>
 
             <div className="side-nav-footer">
-                <button className="side-nav-item" onClick={toggleTheme}>
-                    <span className="side-nav-icon">{theme === 'light' ? '🌙' : '☀️'}</span>
-                    <span className="side-nav-label">
-                        {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-                    </span>
-                </button>
                 <Link to="/settings" className="side-nav-item" onClick={handleNavClick}>
                     <span className="side-nav-icon">⚙️</span>
                     <span className="side-nav-label">Settings</span>

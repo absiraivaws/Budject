@@ -102,8 +102,8 @@ export const BREAKPOINTS = {
   desktop: 1280
 };
 
-export const DB_NAME = 'BudjectDB';
-export const DB_VERSION = 2;
+export const DB_NAME = 'SpendexDB';
+export const DB_VERSION = 3;
 
 export const STORAGE_KEYS = {
   THEME: 'budject_theme',

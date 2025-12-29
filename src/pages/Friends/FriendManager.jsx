@@ -10,7 +10,10 @@ import {
     getAllTransactions,
     addTransaction,
     getAllAccounts,
-    addLedgerEntry
+    addLedgerEntry,
+    addAsset,
+    addLiability,
+    addRecurring
 } from '../../services/db.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
@@ -30,7 +33,16 @@ export default function FriendManager() {
     const [formData, setFormData] = useState({
         name: '',
         contact: '',
-        notes: ''
+        notes: '',
+        // Financial fields
+        initial_amount: '',
+        initial_type: 'lend',
+        initial_account_id: '',
+        return_date: '',
+        // Installment fields
+        has_installments: false,
+        installment_frequency: 'monthly',
+        installment_count: ''
     });
 
     const [transactionData, setTransactionData] = useState({
@@ -63,7 +75,14 @@ export default function FriendManager() {
         setFormData({
             name: '',
             contact: '',
-            notes: ''
+            notes: '',
+            initial_amount: '',
+            initial_type: 'lend',
+            initial_account_id: accounts[0]?.id || '',
+            return_date: '',
+            has_installments: false,
+            installment_frequency: 'monthly',
+            installment_count: ''
         });
         setIsModalOpen(true);
     };
@@ -99,6 +118,19 @@ export default function FriendManager() {
             newErrors.name = 'Name is required';
         }
 
+        // Validate financial fields if amount is provided
+        if (formData.initial_amount && parseFloat(formData.initial_amount) > 0) {
+            if (!formData.initial_account_id) {
+                newErrors.initial_account_id = 'Please select an account';
+            }
+
+            if (formData.has_installments) {
+                if (!formData.installment_count || parseInt(formData.installment_count) <= 0) {
+                    newErrors.installment_count = 'Number of installments must be greater than 0';
+                }
+            }
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -122,9 +154,149 @@ export default function FriendManager() {
         if (!validate()) return;
 
         if (editingFriend) {
-            await updateFriend(editingFriend.id, formData);
+            await updateFriend(editingFriend.id, {
+                name: formData.name,
+                contact: formData.contact,
+                notes: formData.notes
+            });
         } else {
-            await addFriend(formData);
+            // Create friend with initial transaction if amount provided
+            const amount = parseFloat(formData.initial_amount);
+            const hasInitialAmount = amount && amount > 0;
+
+            // Calculate installment amount if applicable
+            const installmentAmount = formData.has_installments && formData.installment_count
+                ? amount / parseInt(formData.installment_count)
+                : 0;
+
+            // Create friend record
+            const newFriend = await addFriend({
+                name: formData.name,
+                contact: formData.contact,
+                notes: formData.notes,
+                initial_amount: hasInitialAmount ? amount : 0,
+                initial_type: formData.initial_type,
+                initial_account_id: formData.initial_account_id,
+                return_date: formData.return_date || null,
+                has_installments: formData.has_installments,
+                installment_frequency: formData.installment_frequency,
+                installment_count: formData.has_installments ? parseInt(formData.installment_count) : 0,
+                installment_amount: installmentAmount,
+                installments_paid: 0
+            });
+
+            // If initial amount provided, create transaction and asset/liability
+            if (hasInitialAmount) {
+                const isLending = formData.initial_type === 'lend';
+                const today = new Date().toISOString().split('T')[0];
+
+                // Create transaction
+                const transaction = await addTransaction({
+                    type: isLending ? 'expense' : 'income',
+                    amount: amount,
+                    account_id: formData.initial_account_id,
+                    date: today,
+                    notes: `${isLending ? 'Lent to' : 'Borrowed from'} ${formData.name}${formData.notes ? ': ' + formData.notes : ''}`,
+                    tags: [`friend:${newFriend.id}`, isLending ? 'lending' : 'borrowing'],
+                    friend_id: newFriend.id,
+                    due_date: formData.return_date || null
+                });
+
+                // Create ledger entries
+                if (isLending) {
+                    // Debit: Receivable (asset increases)
+                    await addLedgerEntry({
+                        transaction_id: transaction.id,
+                        account_id: formData.initial_account_id,
+                        type: 'debit',
+                        amount: amount,
+                        date: today,
+                        description: `Lent to ${formData.name}`
+                    });
+
+                    // Credit: Cash/Bank (asset decreases)
+                    await addLedgerEntry({
+                        transaction_id: transaction.id,
+                        account_id: formData.initial_account_id,
+                        type: 'credit',
+                        amount: amount,
+                        date: today,
+                        description: `Lent to ${formData.name}`
+                    });
+
+                    // Create asset (receivable)
+                    await addAsset({
+                        name: `Loan to ${formData.name}`,
+                        type: 'receivable',
+                        value: amount,
+                        friend_id: newFriend.id,
+                        return_date: formData.return_date || null,
+                        description: formData.notes || `Money lent to ${formData.name}`
+                    });
+                } else {
+                    // Debit: Cash/Bank (asset increases)
+                    await addLedgerEntry({
+                        transaction_id: transaction.id,
+                        account_id: formData.initial_account_id,
+                        type: 'debit',
+                        amount: amount,
+                        date: today,
+                        description: `Borrowed from ${formData.name}`
+                    });
+
+                    // Credit: Payable (liability increases)
+                    await addLedgerEntry({
+                        transaction_id: transaction.id,
+                        account_id: formData.initial_account_id,
+                        type: 'credit',
+                        amount: amount,
+                        date: today,
+                        description: `Borrowed from ${formData.name}`
+                    });
+
+                    // Create liability (payable)
+                    await addLiability({
+                        name: `Loan from ${formData.name}`,
+                        type: 'payable',
+                        value: amount,
+                        friend_id: newFriend.id,
+                        due_date: formData.return_date || null,
+                        description: formData.notes || `Money borrowed from ${formData.name}`
+                    });
+                }
+
+                // Update friend totals
+                await updateFriend(newFriend.id, {
+                    total_lent: isLending ? amount : 0,
+                    total_borrowed: !isLending ? amount : 0,
+                    balance: isLending ? amount : -amount
+                });
+
+                // Create recurring transaction if installments enabled
+                if (formData.has_installments && formData.installment_count) {
+                    const nextMonth = new Date();
+                    nextMonth.setMonth(nextMonth.getMonth() + 1);
+                    nextMonth.setDate(1);
+                    const nextDate = nextMonth.toISOString().split('T')[0];
+
+                    await addRecurring({
+                        name: `${isLending ? 'Installment from' : 'Installment to'} ${formData.name}`,
+                        type: isLending ? 'income' : 'expense',
+                        amount: installmentAmount,
+                        account_id: formData.initial_account_id,
+                        category_id: null,
+                        frequency: formData.installment_frequency,
+                        start_date: nextDate,
+                        end_date: formData.return_date || null,
+                        notes: `${isLending ? 'Installment from' : 'Installment to'} ${formData.name}`,
+                        tags: [`friend:${newFriend.id}`, 'installment'],
+                        next_date: nextDate,
+                        last_processed: null,
+                        is_active: true,
+                        friend_id: newFriend.id
+                    });
+                }
+            }
         }
 
         await loadData();
@@ -298,9 +470,6 @@ export default function FriendManager() {
                         <div className="empty-icon">👥</div>
                         <h3>No friends added yet</h3>
                         <p>Start tracking lending and borrowing with your friends</p>
-                        <Button variant="primary" onClick={handleAdd}>
-                            Add Your First Friend
-                        </Button>
                     </div>
                 ) : (
                     <div className="friend-grid">
@@ -368,42 +537,178 @@ export default function FriendManager() {
                     setEditingFriend(null);
                 }}
                 title={editingFriend ? 'Edit Friend' : 'Add Friend'}
-                size="md"
+                size="lg"
             >
                 <div className="friend-form">
-                    <div className="form-group">
-                        <label className="form-label">Name *</label>
-                        <input
-                            type="text"
-                            className="form-input"
-                            value={formData.name}
-                            onChange={(e) => handleChange('name', e.target.value)}
-                            placeholder="Friend's name"
-                        />
-                        {errors.name && <div className="form-error">{errors.name}</div>}
+                    {/* Basic Information Section */}
+                    <div className="form-section">
+                        <h3 className="form-section-title">Basic Information</h3>
+
+                        <div className="form-group">
+                            <label className="form-label">Name *</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={formData.name}
+                                onChange={(e) => handleChange('name', e.target.value)}
+                                placeholder="Friend's name"
+                            />
+                            {errors.name && <div className="form-error">{errors.name}</div>}
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Contact (Optional)</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={formData.contact}
+                                onChange={(e) => handleChange('contact', e.target.value)}
+                                placeholder="Phone or email"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Notes</label>
+                            <textarea
+                                className="form-textarea"
+                                value={formData.notes}
+                                onChange={(e) => handleChange('notes', e.target.value)}
+                                placeholder="Additional information..."
+                                rows="2"
+                            />
+                        </div>
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label">Contact (Optional)</label>
-                        <input
-                            type="text"
-                            className="form-input"
-                            value={formData.contact}
-                            onChange={(e) => handleChange('contact', e.target.value)}
-                            placeholder="Phone or email"
-                        />
-                    </div>
+                    {/* Financial Details Section - Only show when adding new friend */}
+                    {!editingFriend && (
+                        <>
+                            <div className="form-divider"></div>
 
-                    <div className="form-group">
-                        <label className="form-label">Notes</label>
-                        <textarea
-                            className="form-textarea"
-                            value={formData.notes}
-                            onChange={(e) => handleChange('notes', e.target.value)}
-                            placeholder="Additional information..."
-                            rows="3"
-                        />
-                    </div>
+                            <div className="form-section">
+                                <h3 className="form-section-title">Initial Transaction (Optional)</h3>
+                                <p className="form-section-subtitle">Add initial lending or borrowing details</p>
+
+                                {/* Lent/Borrow Toggle */}
+                                <div className="transaction-type-tabs">
+                                    <button
+                                        type="button"
+                                        className={`type-tab ${formData.initial_type === 'lend' ? 'active lend' : ''}`}
+                                        onClick={() => handleChange('initial_type', 'lend')}
+                                    >
+                                        📤 I Lent
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`type-tab ${formData.initial_type === 'borrow' ? 'active borrow' : ''}`}
+                                        onClick={() => handleChange('initial_type', 'borrow')}
+                                    >
+                                        📥 I Borrowed
+                                    </button>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label className="form-label">Amount</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            className="form-input"
+                                            value={formData.initial_amount}
+                                            onChange={(e) => handleChange('initial_amount', e.target.value)}
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Account</label>
+                                        <select
+                                            className="form-select"
+                                            value={formData.initial_account_id}
+                                            onChange={(e) => handleChange('initial_account_id', e.target.value)}
+                                        >
+                                            <option value="">Select account</option>
+                                            {accounts.map(account => (
+                                                <option key={account.id} value={account.id}>
+                                                    {account.icon} {account.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {errors.initial_account_id && <div className="form-error">{errors.initial_account_id}</div>}
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Return Date</label>
+                                    <input
+                                        type="date"
+                                        className="form-input"
+                                        value={formData.return_date}
+                                        onChange={(e) => handleChange('return_date', e.target.value)}
+                                    />
+                                </div>
+
+                                {/* Installment Options */}
+                                {formData.initial_amount && parseFloat(formData.initial_amount) > 0 && (
+                                    <>
+                                        <div className="form-group">
+                                            <label className="form-checkbox">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.has_installments}
+                                                    onChange={(e) => handleChange('has_installments', e.target.checked)}
+                                                />
+                                                <span>Enable Installment Payments</span>
+                                            </label>
+                                        </div>
+
+                                        {formData.has_installments && (
+                                            <div className="installment-details">
+                                                <div className="form-row">
+                                                    <div className="form-group">
+                                                        <label className="form-label">Frequency</label>
+                                                        <select
+                                                            className="form-select"
+                                                            value={formData.installment_frequency}
+                                                            onChange={(e) => handleChange('installment_frequency', e.target.value)}
+                                                        >
+                                                            <option value="weekly">Weekly</option>
+                                                            <option value="monthly">Monthly</option>
+                                                            <option value="quarterly">Quarterly</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label className="form-label">Number of Installments</label>
+                                                        <input
+                                                            type="number"
+                                                            className="form-input"
+                                                            value={formData.installment_count}
+                                                            onChange={(e) => handleChange('installment_count', e.target.value)}
+                                                            placeholder="e.g., 10"
+                                                            min="1"
+                                                        />
+                                                        {errors.installment_count && <div className="form-error">{errors.installment_count}</div>}
+                                                    </div>
+                                                </div>
+
+                                                {formData.installment_count && parseInt(formData.installment_count) > 0 && (
+                                                    <div className="installment-summary">
+                                                        <span className="installment-label">Amount per installment:</span>
+                                                        <span className="installment-value">
+                                                            {formatCurrency(
+                                                                parseFloat(formData.initial_amount) / parseInt(formData.installment_count),
+                                                                currency
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </>
+                    )}
 
                     <div className="modal-footer">
                         <Button

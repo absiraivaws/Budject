@@ -69,6 +69,12 @@ export async function initDB() {
                 const friendsStore = db.createObjectStore('friends', { keyPath: 'id' });
                 friendsStore.createIndex('name', 'name');
             }
+
+            // Users Store (for authentication)
+            if (!db.objectStoreNames.contains('users')) {
+                const usersStore = db.createObjectStore('users', { keyPath: 'id' });
+                usersStore.createIndex('email', 'email', { unique: true });
+            }
         }
     });
 
@@ -415,6 +421,53 @@ export async function updateFriend(id, updates) {
 export async function deleteFriend(id) {
     const db = await getDB();
     await db.delete('friends', id);
+}
+
+// ========================================
+// USER OPERATIONS (Authentication)
+// ========================================
+
+export async function getAllUsers() {
+    const db = await getDB();
+    return await db.getAll('users');
+}
+
+export async function getUser(id) {
+    const db = await getDB();
+    return await db.get('users', id);
+}
+
+export async function getUserByEmail(email) {
+    const db = await getDB();
+    const users = await db.getAllFromIndex('users', 'email', email);
+    return users[0] || null;
+}
+
+export async function addUser(user) {
+    const db = await getDB();
+    const id = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const newUser = {
+        ...user,
+        id,
+        created_at: new Date().toISOString(),
+        last_login: null
+    };
+    await db.add('users', newUser);
+    return newUser;
+}
+
+export async function updateUser(id, updates) {
+    const db = await getDB();
+    const user = await db.get('users', id);
+    if (!user) throw new Error('User not found');
+    const updatedUser = { ...user, ...updates, updated_at: new Date().toISOString() };
+    await db.put('users', updatedUser);
+    return updatedUser;
+}
+
+export async function deleteUser(id) {
+    const db = await getDB();
+    await db.delete('users', id);
 }
 
 // ========================================

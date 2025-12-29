@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
 import { useTheme } from '../../context/ThemeContext.jsx';
 import { useFontSize } from '../../context/FontSizeContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import Card from '../../components/UI/Card.jsx';
 import Button from '../../components/UI/Button.jsx';
 import Modal from '../../components/UI/Modal.jsx';
@@ -10,11 +12,17 @@ import { exportAllData, importData, clearAllData } from '../../services/db.js';
 import './Settings.css';
 
 export default function Settings() {
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
     const { currency, setCurrency } = useCurrency();
     const { theme, toggleTheme } = useTheme();
     const { fontSize, setFontSize, fontSizes, currentSize } = useFontSize();
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const [importStatus, setImportStatus] = useState(null);
+    const [budgetRollover, setBudgetRollover] = useState(() => {
+        const saved = localStorage.getItem('budgetRollover');
+        return saved !== null ? JSON.parse(saved) : true;
+    });
 
     const handleExport = async () => {
         try {
@@ -64,9 +72,69 @@ export default function Settings() {
         }
     };
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
+    const handleBudgetRolloverChange = (e) => {
+        const value = e.target.checked;
+        setBudgetRollover(value);
+        localStorage.setItem('budgetRollover', JSON.stringify(value));
+    };
+
     return (
         <div className="settings-page fade-in">
             <h1>Settings</h1>
+
+            {/* Account */}
+            <Card title="Account">
+                <div className="settings-section">
+                    {user?.displayName && (
+                        <div className="setting-item">
+                            <div className="setting-info">
+                                <div className="setting-label">Display Name</div>
+                                <div className="setting-description">
+                                    {user.displayName}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div className="setting-item">
+                        <div className="setting-info">
+                            <div className="setting-label">Email</div>
+                            <div className="setting-description">
+                                {user?.email || 'Not logged in'}
+                            </div>
+                        </div>
+                        <Button variant="danger" onClick={handleLogout}>
+                            🚪 Logout
+                        </Button>
+                    </div>
+                </div>
+            </Card>
+
+            {/* Budget Settings */}
+            <Card title="Budget Settings">
+                <div className="settings-section">
+                    <div className="setting-item">
+                        <div className="setting-info">
+                            <div className="setting-label">Budget Rollover</div>
+                            <div className="setting-description">
+                                Carry remaining budget to next month automatically
+                            </div>
+                        </div>
+                        <label className="toggle-switch">
+                            <input
+                                type="checkbox"
+                                checked={budgetRollover}
+                                onChange={handleBudgetRolloverChange}
+                            />
+                            <span className="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </Card>
 
             {/* Appearance */}
             <Card title="Appearance">
@@ -209,7 +277,7 @@ export default function Settings() {
             <Card title="About">
                 <div className="settings-section">
                     <div className="about-info">
-                        <h3>Budject - Budget & Money Manager</h3>
+                        <h3>Spendex - Budget & Money Manager</h3>
                         <p className="text-secondary">Version 1.0.0</p>
                         <p className="text-secondary" style={{ marginTop: 'var(--spacing-md)' }}>
                             A comprehensive personal finance management application with double-entry accounting,

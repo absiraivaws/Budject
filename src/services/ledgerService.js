@@ -1,4 +1,4 @@
-import { addLedgerEntry, deleteLedgerEntries, updateAccount, getAccount } from './db.js';
+import { addLedgerEntry, deleteLedgerEntries, getLedgerEntries, updateAccount, getAccount } from './db.js';
 import { TRANSACTION_TYPES } from '../config/constants.js';
 
 /**

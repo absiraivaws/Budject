@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Card from '../../components/UI/Card.jsx';
 import Button from '../../components/UI/Button.jsx';
 import Modal from '../../components/UI/Modal.jsx';
@@ -13,16 +14,27 @@ import {
 import { formatCurrency } from '../../utils/currency.js';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
 import { TRANSACTION_TYPES, RECURRING_FREQUENCIES } from '../../config/constants.js';
+import {
+    processRecurringTransactions,
+    processSingleRecurring,
+    countTransactionsFromRecurring
+} from '../../services/recurringProcessor.js';
 import './RecurringManager.css';
 
 export default function RecurringManager() {
     const { currency } = useCurrency();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [recurringTransactions, setRecurringTransactions] = useState([]);
     const [accounts, setAccounts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRecurring, setEditingRecurring] = useState(null);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [transactionCounts, setTransactionCounts] = useState({});
+    const [processing, setProcessing] = useState(false);
+    const [highlightId, setHighlightId] = useState(null);
+    const highlightRef = useRef(null);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -44,6 +56,25 @@ export default function RecurringManager() {
         loadData();
     }, []);
 
+    // Handle URL parameter for highlighting
+    useEffect(() => {
+        const highlight = searchParams.get('highlight');
+        if (highlight) {
+            setHighlightId(highlight);
+            // Scroll to highlighted item after a short delay
+            setTimeout(() => {
+                if (highlightRef.current) {
+                    highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 300);
+            // Remove highlight after animation
+            setTimeout(() => {
+                setHighlightId(null);
+            }, 3000);
+        }
+    }, [searchParams, recurringTransactions]);
+
+
     async function loadData() {
         const [recurringData, accountsData, categoriesData] = await Promise.all([
             getAllRecurringTransactions(),
@@ -54,7 +85,46 @@ export default function RecurringManager() {
         setRecurringTransactions(recurringData);
         setAccounts(accountsData);
         setCategories(categoriesData);
+
+        // Load transaction counts for each recurring rule
+        const counts = {};
+        for (const rec of recurringData) {
+            counts[rec.id] = await countTransactionsFromRecurring(rec.id);
+        }
+        setTransactionCounts(counts);
     }
+
+    const handleProcessNow = async (recurring) => {
+        setProcessing(true);
+        try {
+            await processSingleRecurring(recurring);
+            await loadData();
+            alert(`Successfully processed: ${recurring.name}`);
+        } catch (error) {
+            console.error('Error processing recurring transaction:', error);
+            alert('Error processing transaction. Please try again.');
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const handleProcessAllDue = async () => {
+        setProcessing(true);
+        try {
+            const createdTransactions = await processRecurringTransactions();
+            await loadData();
+            if (createdTransactions.length > 0) {
+                alert(`Successfully processed ${createdTransactions.length} recurring transaction(s)`);
+            } else {
+                alert('No due recurring transactions to process');
+            }
+        } catch (error) {
+            console.error('Error processing recurring transactions:', error);
+            alert('Error processing transactions. Please try again.');
+        } finally {
+            setProcessing(false);
+        }
+    };
 
     const handleAdd = () => {
         setEditingRecurring(null);
@@ -141,7 +211,11 @@ export default function RecurringManager() {
         if (editingRecurring) {
             await updateRecurringTransaction(editingRecurring.id, recurringData);
         } else {
-            await addRecurringTransaction(recurringData);
+            // Initialize next_date to start_date for new recurring transactions
+            await addRecurringTransaction({
+                ...recurringData,
+                next_date: formData.start_date
+            });
         }
 
         await loadData();
@@ -200,9 +274,18 @@ export default function RecurringManager() {
                     <h1>Recurring Transactions</h1>
                     <p className="text-secondary">Automate your regular income and expenses</p>
                 </div>
-                <Button variant="primary" onClick={handleAdd}>
-                    + Add Recurring
-                </Button>
+                <div className="header-buttons">
+                    <Button
+                        variant="secondary"
+                        onClick={handleProcessAllDue}
+                        disabled={processing}
+                    >
+                        {processing ? '⏳ Processing...' : '▶️ Process All Due'}
+                    </Button>
+                    <Button variant="primary" onClick={handleAdd}>
+                        + Add Recurring
+                    </Button>
+                </div>
             </div>
 
             {/* Active Recurring Transactions */}
@@ -216,7 +299,11 @@ export default function RecurringManager() {
                 ) : (
                     <div className="recurring-list">
                         {activeRecurring.map(recurring => (
-                            <div key={recurring.id} className={`recurring-item ${recurring.type}`}>
+                            <div
+                                key={recurring.id}
+                                className={`recurring-item ${recurring.type} ${highlightId === recurring.id ? 'highlighted' : ''}`}
+                                ref={highlightId === recurring.id ? highlightRef : null}
+                            >
                                 <div className={`recurring-type-indicator ${recurring.type}`}></div>
 
                                 <div className="recurring-main">
@@ -244,6 +331,25 @@ export default function RecurringManager() {
                                         {recurring.notes && (
                                             <div className="recurring-notes">{recurring.notes}</div>
                                         )}
+                                        <div className="recurring-schedule">
+                                            {recurring.next_date && (
+                                                <span className="recurring-next-date">
+                                                    📅 Next: {recurring.next_date}
+                                                </span>
+                                            )}
+                                            {transactionCounts[recurring.id] > 0 && (
+                                                <>
+                                                    <span className="recurring-separator">•</span>
+                                                    <button
+                                                        className="view-transactions-link"
+                                                        onClick={() => navigate(`/transactions?recurringId=${recurring.id}`)}
+                                                        title="View all transactions from this recurring rule"
+                                                    >
+                                                        {transactionCounts[recurring.id]} transaction{transactionCounts[recurring.id] !== 1 ? 's' : ''} created
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div className="recurring-right">
@@ -253,6 +359,14 @@ export default function RecurringManager() {
                                             {formatCurrency(recurring.amount, currency)}
                                         </div>
                                         <div className="recurring-actions">
+                                            <button
+                                                className="recurring-action-btn"
+                                                onClick={() => handleProcessNow(recurring)}
+                                                title="Process Now"
+                                                disabled={processing}
+                                            >
+                                                ▶️
+                                            </button>
                                             <button
                                                 className="recurring-action-btn"
                                                 onClick={() => handleToggleActive(recurring)}
