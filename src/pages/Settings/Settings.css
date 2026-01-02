@@ -51,6 +51,11 @@
     min-width: 250px;
 }
 
+.reminder-time-select {
+    min-width: 150px;
+}
+
+
 .import-status {
     margin-top: var(--spacing-sm);
     padding: var(--spacing-sm) var(--spacing-md);
@@ -119,6 +124,7 @@
     background: var(--color-border);
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .font-size-slider::-webkit-slider-thumb {

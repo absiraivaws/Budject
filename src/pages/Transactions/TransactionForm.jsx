@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Button from '../../components/UI/Button.jsx';
 import Calculator from './Calculator.jsx';
+import SMSImportModal from '../../components/SMSParser/SMSImportModal.jsx';
 import { TRANSACTION_TYPES } from '../../config/constants.js';
 import { getAllAccounts, getAllCategories, addTransaction } from '../../services/db.js';
 import { createLedgerEntries } from '../../services/ledgerService.js';
@@ -12,6 +13,7 @@ import './TransactionForm.css';
 export default function TransactionForm({ transaction, onSave, onCancel }) {
     const { currency } = useCurrency();
     const [showCalculator, setShowCalculator] = useState(false);
+    const [showSMSImport, setShowSMSImport] = useState(false);
     const [accounts, setAccounts] = useState([]);
     const [categories, setCategories] = useState([]);
 
@@ -66,6 +68,19 @@ export default function TransactionForm({ transaction, onSave, onCancel }) {
     const handleAmountFromCalculator = (value) => {
         handleChange('amount', value);
         setShowCalculator(false);
+    };
+
+    const handleSMSImport = (transactionData) => {
+        // Pre-fill form with imported data
+        setFormData(prev => ({
+            ...prev,
+            amount: transactionData.amount || prev.amount,
+            type: transactionData.type || prev.type,
+            date: transactionData.date || prev.date,
+            account_id: transactionData.accountId || prev.account_id,
+            notes: transactionData.notes || prev.notes
+        }));
+        setShowSMSImport(false);
     };
 
     const validate = () => {
@@ -149,6 +164,25 @@ export default function TransactionForm({ transaction, onSave, onCancel }) {
                     🔄 Transfer
                 </button>
             </div>
+
+            {/* SMS Import Button */}
+            <div className="sms-import-banner">
+                <button
+                    type="button"
+                    className="sms-import-btn"
+                    onClick={() => setShowSMSImport(true)}
+                >
+                    📱 Import from SMS
+                </button>
+                <span className="sms-import-hint">Paste bank SMS to auto-fill</span>
+            </div>
+
+            {/* SMS Import Modal */}
+            <SMSImportModal
+                isOpen={showSMSImport}
+                onClose={() => setShowSMSImport(false)}
+                onImport={handleSMSImport}
+            />
 
             {/* Amount Input */}
             <div className="form-group">
