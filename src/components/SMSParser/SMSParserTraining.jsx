@@ -135,12 +135,11 @@ export default function SMSParserTraining() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
 
-                        {/* Bank Dropdown */}
+                        {/* Bank Dropdown - Normal dropdown that shows selected value */}
                         <select
                             className="form-select bank-select-with-ai"
                             value={selectedBank}
                             onChange={handleBankChange}
-                            size={filteredBanks.length > 10 ? 10 : filteredBanks.length}
                         >
                             {filteredBanks.map(bank => (
                                 <option key={bank.id} value={bank.id}>

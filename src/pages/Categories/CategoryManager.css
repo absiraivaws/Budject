@@ -21,14 +21,15 @@
 
 .category-tab {
     padding: var(--spacing-md) var(--spacing-lg);
-    background: var(--color-bg-tertiary);
-    border: 2px solid transparent;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
     border-radius: var(--radius-lg);
     cursor: pointer;
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
 }
 
 .category-tab:hover {
@@ -66,14 +67,18 @@
     align-items: center;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
-    background: var(--color-bg-tertiary);
+    background: var(--color-surface);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
+    border: 2px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
 }
 
 .category-item:hover {
     background: var(--color-surface-hover);
     transform: translateX(4px);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
 }
 
 .category-icon {

@@ -20,11 +20,13 @@
     gap: var(--spacing-lg);
     padding: var(--spacing-md);
     border-radius: var(--radius-md);
-    transition: background var(--transition-fast);
+    transition: all var(--transition-fast);
+    border: 2px solid transparent;
 }
 
 .setting-item:hover {
     background: var(--color-bg-tertiary);
+    border-color: var(--color-border);
 }
 
 .setting-item.danger-zone {

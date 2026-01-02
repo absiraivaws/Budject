@@ -34,6 +34,7 @@
     justify-content: center;
     background: var(--color-primary-light);
     border-radius: var(--radius-xl);
+    border: 2px solid var(--color-border-light);
 }
 
 .summary-info {
@@ -80,10 +81,14 @@
 
 .account-card {
     transition: all var(--transition-base);
+    border: 2px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
 }
 
 .account-card:hover {
     transform: translateY(-4px);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-lg);
 }
 
 .account-card-header {
