@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { SRI_LANKAN_BANKS } from '../../config/constants.js';
 import {
     parseTransactionSMS,
@@ -17,6 +17,26 @@ export default function SMSParserTraining() {
     const [parsedData, setParsedData] = useState(null);
     const [accuracy, setAccuracy] = useState(0);
     const [sampleCount, setSampleCount] = useState(0);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Get AI learning data for all banks
+    const banksWithAI = useMemo(() => {
+        return SRI_LANKAN_BANKS.map(bank => ({
+            ...bank,
+            accuracy: getParsingAccuracy(bank.id),
+            sampleCount: getTrainingSampleCount(bank.id)
+        }));
+    }, []);
+
+    // Filter banks based on search query
+    const filteredBanks = useMemo(() => {
+        if (!searchQuery.trim()) return banksWithAI;
+
+        const query = searchQuery.toLowerCase();
+        return banksWithAI.filter(bank =>
+            bank.name.toLowerCase().includes(query)
+        );
+    }, [searchQuery, banksWithAI]);
 
     // Load accuracy and sample count when bank changes
     const handleBankChange = (e) => {
@@ -101,21 +121,39 @@ export default function SMSParserTraining() {
                     This improves accuracy for quick transaction imports.
                 </p>
 
-                {/* Bank Selector */}
+                {/* Bank Selector with Search */}
                 <div className="sms-training-section">
                     <label className="sms-training-label">
                         <span className="label-text">Select Your Bank</span>
+
+                        {/* Search Input */}
+                        <input
+                            type="text"
+                            className="bank-search-input"
+                            placeholder="🔍 Search banks..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+
+                        {/* Bank Dropdown */}
                         <select
-                            className="form-select"
+                            className="form-select bank-select-with-ai"
                             value={selectedBank}
                             onChange={handleBankChange}
+                            size={filteredBanks.length > 10 ? 10 : filteredBanks.length}
                         >
-                            {SRI_LANKAN_BANKS.map(bank => (
+                            {filteredBanks.map(bank => (
                                 <option key={bank.id} value={bank.id}>
-                                    {bank.icon} {bank.name}
+                                    {bank.icon} {bank.name} {bank.accuracy > 0 ? `(AI: ${Math.round(bank.accuracy * 100)}%)` : ''}
                                 </option>
                             ))}
                         </select>
+
+                        {filteredBanks.length === 0 && (
+                            <div className="no-results">
+                                No banks found matching "{searchQuery}"
+                            </div>
+                        )}
                     </label>
                 </div>
 
