@@ -21,6 +21,7 @@ export default function AccountForm({ account, onSave, onCancel }) {
         currency: account?.currency || currency,
         color: account?.color || COLOR_PALETTE[0],
         icon: account?.icon || '💵',
+        accountNumber: account?.accountNumber || '',
 
         // Interest-bearing accounts (Savings, FD, Credit Card)
         interest_rate: account?.interest_rate || '',
@@ -211,6 +212,21 @@ export default function AccountForm({ account, onSave, onCancel }) {
                     placeholder="0.00"
                 />
                 {errors.balance && <div className="form-error">{errors.balance}</div>}
+            </div>
+
+            {/* Account Number Field */}
+            <div className="form-group">
+                <label className="form-label">Account Number (Optional)</label>
+                <input
+                    type="text"
+                    className="form-input"
+                    value={formData.accountNumber}
+                    onChange={(e) => handleChange('accountNumber', e.target.value)}
+                    placeholder="e.g., 044-2001****00 or **8399"
+                />
+                <small className="text-secondary">
+                    💡 Add your account number for automatic SMS matching (last 4 digits work too)
+                </small>
             </div>
 
             {/* Credit Card Specific Fields */}

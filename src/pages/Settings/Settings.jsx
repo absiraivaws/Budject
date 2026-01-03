@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
 import { useTheme } from '../../context/ThemeContext.jsx';
@@ -7,9 +7,12 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import Card from '../../components/UI/Card.jsx';
 import Button from '../../components/UI/Button.jsx';
 import Modal from '../../components/UI/Modal.jsx';
-import { CURRENCIES } from '../../config/constants.js';
+import SMSParserTraining from '../../components/SMSParser/SMSParserTraining.jsx';
+import { CURRENCIES, REMINDER_TIMES } from '../../config/constants.js';
 import { exportAllData, importData, clearAllData } from '../../services/db.js';
 import { getUserRoot } from '../../services/firestoreService.js';
+import { getDailyReminderSettings, setDailyReminderSettings } from '../../services/storageService.js';
+import { requestNotificationPermission, getNotificationPermission, isNotificationSupported } from '../../services/notificationService.js';
 import './Settings.css';
 
 export default function Settings() {
@@ -24,6 +27,8 @@ export default function Settings() {
         const saved = localStorage.getItem('budgetRollover');
         return saved !== null ? JSON.parse(saved) : true;
     });
+    const [reminderSettings, setReminderSettings] = useState(() => getDailyReminderSettings());
+    const [notificationPermission, setNotificationPermission] = useState(() => getNotificationPermission() || 'default');
 
     const handleExport = async () => {
         try {
@@ -127,6 +132,54 @@ export default function Settings() {
         }
     };
 
+    const handleReminderToggle = (e) => {
+        const newSettings = {
+            ...reminderSettings,
+            enabled: e.target.checked
+        };
+        setReminderSettings(newSettings);
+        setDailyReminderSettings(newSettings);
+    };
+
+    const handleReminderTimeChange = (e) => {
+        const newSettings = {
+            ...reminderSettings,
+            time: e.target.value
+        };
+        setReminderSettings(newSettings);
+        setDailyReminderSettings(newSettings);
+    };
+
+    const handleEmailReminderToggle = (e) => {
+        const newSettings = {
+            ...reminderSettings,
+            emailEnabled: e.target.checked
+        };
+        setReminderSettings(newSettings);
+        setDailyReminderSettings(newSettings);
+    };
+
+    const handleBrowserNotificationToggle = (e) => {
+        const newSettings = {
+            ...reminderSettings,
+            browserNotificationEnabled: e.target.checked
+        };
+        setReminderSettings(newSettings);
+        setDailyReminderSettings(newSettings);
+    };
+
+    const handleRequestNotificationPermission = async () => {
+        const permission = await requestNotificationPermission();
+        setNotificationPermission(permission);
+
+        if (permission === 'granted') {
+            alert('✅ Notification permission granted! You\'ll now receive browser reminders.');
+        } else if (permission === 'denied') {
+            alert('❌ Notification permission denied. You can enable it in your browser settings.');
+
+        }
+    };
+
     return (
         <div className="settings-page fade-in">
             <h1>Settings</h1>
@@ -201,6 +254,104 @@ export default function Settings() {
                     </div>
                 </div>
             </Card>
+
+            {/* Reminders */}
+            <Card title="Daily Reminders">
+                <div className="settings-section">
+                    <div className="setting-item">
+                        <div className="setting-info">
+                            <div className="setting-label">Enable Daily Reminders</div>
+                            <div className="setting-description">
+                                Get reminded to log your daily transactions
+                            </div>
+                        </div>
+                        <label className="toggle-switch">
+                            <input
+                                type="checkbox"
+                                checked={reminderSettings.enabled}
+                                onChange={handleReminderToggle}
+                            />
+                            <span className="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    {reminderSettings.enabled && (
+                        <>
+                            <div className="setting-item">
+                                <div className="setting-info">
+                                    <div className="setting-label">Reminder Time</div>
+                                    <div className="setting-description">
+                                        Choose when you'd like to be reminded
+                                    </div>
+                                </div>
+                                <select
+                                    className="form-select reminder-time-select"
+                                    value={reminderSettings.time}
+                                    onChange={handleReminderTimeChange}
+                                >
+                                    {REMINDER_TIMES.map(time => (
+                                        <option key={time.value} value={time.value}>
+                                            {time.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="setting-item">
+                                <div className="setting-info">
+                                    <div className="setting-label">Email Reminders</div>
+                                    <div className="setting-description">
+                                        Receive reminder emails (requires Firebase setup)
+                                    </div>
+                                </div>
+                                <label className="toggle-switch">
+                                    <input
+                                        type="checkbox"
+                                        checked={reminderSettings.emailEnabled}
+                                        onChange={handleEmailReminderToggle}
+                                    />
+                                    <span className="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div className="setting-item">
+                                <div className="setting-info">
+                                    <div className="setting-label">Browser Notifications</div>
+                                    <div className="setting-description">
+                                        Show notifications when app is open
+                                        {notificationPermission === 'granted' && ' ✅'}
+                                        {notificationPermission === 'denied' && ' ❌'}
+                                        {notificationPermission === 'default' && ' ⚠️ Permission needed'}
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
+                                    <label className="toggle-switch">
+                                        <input
+                                            type="checkbox"
+                                            checked={reminderSettings.browserNotificationEnabled}
+                                            onChange={handleBrowserNotificationToggle}
+                                            disabled={!isNotificationSupported()}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                    {notificationPermission !== 'granted' && isNotificationSupported() && (
+                                        <Button
+                                            variant="secondary"
+                                            onClick={handleRequestNotificationPermission}
+                                            style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
+                                        >
+                                            Enable Notifications
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </Card>
+
+            {/* SMS Parser Training */}
+            <SMSParserTraining />
 
             {/* Appearance */}
             <Card title="Appearance">

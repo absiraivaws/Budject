@@ -1,0 +1,141 @@
+.reminder-prompt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.reminder-prompt-overlay.visible {
+    opacity: 1;
+}
+
+.reminder-prompt {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    max-width: 480px;
+    width: 90%;
+    box-shadow: var(--shadow-xl);
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid var(--border-color);
+}
+
+.reminder-prompt.visible {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.reminder-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+    animation: bounce 1s ease infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.reminder-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.reminder-message {
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    line-height: 1.6;
+}
+
+.reminder-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.reminder-btn-primary {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.reminder-secondary-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.reminder-link-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    transition: color 0.2s ease;
+    text-decoration: underline;
+}
+
+.reminder-link-btn:hover {
+    color: var(--primary-color);
+}
+
+.reminder-link-btn:active {
+    transform: scale(0.98);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .reminder-prompt {
+        padding: var(--spacing-lg);
+        max-width: 95%;
+    }
+
+    .reminder-title {
+        font-size: 1.25rem;
+    }
+
+    .reminder-icon {
+        font-size: 2.5rem;
+    }
+
+    .reminder-secondary-actions {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .reminder-prompt {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .reminder-prompt-overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+}
