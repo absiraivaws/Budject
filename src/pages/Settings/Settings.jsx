@@ -120,18 +120,6 @@ export default function Settings() {
         }
     };
 
-    const handleShare = async () => {
-        if (navigator.share) {
-            try {
-                await navigator.share({ title: 'Join me on Budject', text: 'Create an account using my referral link', url: referralLink });
-            } catch (err) {
-                console.error('Share failed', err);
-            }
-        } else {
-            handleCopyLink();
-        }
-    };
-
     const handleReminderToggle = (e) => {
         const newSettings = {
             ...reminderSettings,
@@ -236,7 +224,7 @@ export default function Settings() {
             {/* Referrals */}
             <Card title="Referrals">
                 <div className="settings-section">
-                    <div className="setting-item">
+                    <div>
                         <div className="setting-info">
                             <div className="setting-label">Your Referral Link</div>
                             <div className="setting-description">
@@ -244,10 +232,11 @@ export default function Settings() {
                             </div>
                         </div>
                         <div className="referral-controls">
-                            <div className="referral-link">{referralLink}</div>
-                            <div className="referral-actions">
-                                <Button variant="secondary" onClick={handleCopyLink}>{copied ? 'Copied' : 'Copy Link'}</Button>
-                                <Button variant="primary" onClick={handleShare}>Share</Button>
+                            <div className="referral-row">
+                                <div className="referral-link" title={referralLink}>{referralLink}</div>
+                                <div className="referral-actions">
+                                    <Button variant="primary" onClick={handleCopyLink}>{copied ? 'Copied' : 'Copy Link'}</Button>
+                                </div>
                             </div>
                             <div className="referral-count">Referrals: <strong>{referralsCount}</strong></div>
                         </div>
