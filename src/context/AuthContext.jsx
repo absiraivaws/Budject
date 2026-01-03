@@ -8,7 +8,7 @@ import {
     updateProfile
 } from 'firebase/auth';
 import { auth } from '../config/firebase.js';
-import { initializeDefaultData, createOrUpdateUserRoot } from '../services/firestoreService.js';
+import { initializeDefaultData, createOrUpdateUserRoot, recordReferralOnSignup } from '../services/firestoreService.js';
 
 const AuthContext = createContext(null);
 
@@ -51,28 +51,18 @@ export function AuthProvider({ children }) {
 
         // Create root user document
         try {
-            // Include referredBy in the user root doc so it's recorded
             await createOrUpdateUserRoot(userCredential.user.uid, {
                 email: userCredential.user.email,
                 displayName: displayName || userCredential.user.displayName,
-                referrals: 0,
-                referredBy: referredBy || null
+                referrals: 0
             });
 
-            // If referredBy present, notify server-side endpoint (Vercel) to increment referrer's count
+            // If referredBy present, record referral
             if (referredBy) {
                 try {
-                    const idToken = await userCredential.user.getIdToken();
-                    await fetch('/api/referral', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${idToken}`
-                        },
-                        body: JSON.stringify({ referrerId: referredBy, newUserId: userCredential.user.uid })
-                    });
+                    await recordReferralOnSignup(userCredential.user.uid, referredBy);
                 } catch (e) {
-                    console.error('Failed to notify referral endpoint:', e);
+                    console.error('Failed to record referral:', e);
                 }
             }
         } catch (err) {
