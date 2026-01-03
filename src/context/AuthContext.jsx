@@ -8,7 +8,7 @@ import {
     updateProfile
 } from 'firebase/auth';
 import { auth } from '../config/firebase.js';
-import { initializeDefaultData } from '../services/firestoreService.js';
+import { initializeDefaultData, createOrUpdateUserRoot, recordReferralOnSignup } from '../services/firestoreService.js';
 
 const AuthContext = createContext(null);
 
@@ -41,12 +41,32 @@ export function AuthProvider({ children }) {
         return unsubscribe;
     }, []);
 
-    const register = async (email, password, displayName = '') => {
+    const register = async (email, password, displayName = '', referredBy = null) => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
         // Update profile with display name if provided
         if (displayName) {
             await updateProfile(userCredential.user, { displayName });
+        }
+
+        // Create root user document
+        try {
+            await createOrUpdateUserRoot(userCredential.user.uid, {
+                email: userCredential.user.email,
+                displayName: displayName || userCredential.user.displayName,
+                referrals: 0
+            });
+
+            // If referredBy present, record referral
+            if (referredBy) {
+                try {
+                    await recordReferralOnSignup(userCredential.user.uid, referredBy);
+                } catch (e) {
+                    console.error('Failed to record referral:', e);
+                }
+            }
+        } catch (err) {
+            console.error('Error creating user root doc:', err);
         }
 
         return {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import './Auth.css';
 
@@ -15,6 +15,15 @@ export default function Register() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [referredBy, setReferredBy] = useState(null);
+
+    const location = useLocation();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const ref = params.get('ref');
+        if (ref) setReferredBy(ref);
+    }, [location.search]);
 
     // Redirect if already authenticated
     useEffect(() => {
@@ -56,7 +65,7 @@ export default function Register() {
         setLoading(true);
 
         try {
-            await register(formData.email, formData.password, formData.displayName);
+            await register(formData.email, formData.password, formData.displayName, referredBy);
             navigate('/');
         } catch (err) {
             console.error('Registration error:', err);

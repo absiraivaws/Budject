@@ -3,6 +3,7 @@ import { useDeviceType } from '../../hooks/useMediaQuery.js';
 import BottomNav from '../Navigation/BottomNav.jsx';
 import SideNav from '../Navigation/SideNav.jsx';
 import './ResponsiveLayout.css';
+import ThemeToggle from '../UI/ThemeToggle.jsx';
 
 export default function ResponsiveLayout({ children }) {
     const deviceType = useDeviceType();
@@ -18,6 +19,7 @@ export default function ResponsiveLayout({ children }) {
 
     return (
         <div className={`app-layout device-${deviceType}`}>
+            {/* <ThemeToggle /> */}
             {/* Hamburger Menu Button - Only on Mobile */}
             {deviceType === 'mobile' && (
                 <button
