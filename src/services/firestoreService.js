@@ -15,7 +15,11 @@ import {
     where,
     orderBy,
     Timestamp,
-    writeBatch
+    writeBatch,
+    setDoc,
+    increment,
+    getFirestore,
+    runTransaction
 } from 'firebase/firestore';
 import { db, auth } from '../config/firebase.js';
 
@@ -367,6 +371,61 @@ export async function deleteLedgerEntries(transactionId) {
         batch.delete(docRef);
     });
     await batch.commit();
+}
+
+// ========================================
+// USER ROOT DOCUMENT OPERATIONS (for referrals)
+// ========================================
+
+export async function createOrUpdateUserRoot(userId, data = {}) {
+    const userRef = doc(db, 'users', userId);
+    const payload = {
+        ...data,
+        updated_at: Timestamp.now()
+    };
+    try {
+        await setDoc(userRef, payload, { merge: true });
+        return { id: userId, ...payload };
+    } catch (err) {
+        console.error('Error creating/updating user root doc:', err);
+        throw err;
+    }
+}
+
+export async function getUserRoot() {
+    const userId = getUserId();
+    const userRef = doc(db, 'users', userId);
+    const snap = await getDoc(userRef);
+    return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+export async function recordReferralOnSignup(newUserId, referrerId) {
+    if (!referrerId) return;
+
+    const newUserRef = doc(db, 'users', newUserId);
+    const referrerRef = doc(db, 'users', referrerId);
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            // Set referredBy on new user's root doc if not already set
+            const newUserSnap = await transaction.get(newUserRef);
+            if (!newUserSnap.exists() || !newUserSnap.data().referredBy) {
+                transaction.set(newUserRef, { referredBy: referrerId, created_at: Timestamp.now() }, { merge: true });
+            }
+
+            // Increment referrer's referrals count
+            const refSnap = await transaction.get(referrerRef);
+            if (refSnap.exists()) {
+                const current = refSnap.data().referrals || 0;
+                transaction.update(referrerRef, { referrals: current + 1, updated_at: Timestamp.now() });
+            } else {
+                transaction.set(referrerRef, { referrals: 1, created_at: Timestamp.now() }, { merge: true });
+            }
+        });
+    } catch (err) {
+        console.error('Error recording referral on signup:', err);
+        throw err;
+    }
 }
 
 // ========================================
