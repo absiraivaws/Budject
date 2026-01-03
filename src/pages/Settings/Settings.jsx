@@ -96,6 +96,7 @@ export default function Settings() {
     useEffect(() => {
         let mounted = true;
         async function fetchProfile() {
+            if (!user?.id) return;
             try {
                 const profile = await getUserRoot();
                 if (!mounted) return;
@@ -106,7 +107,7 @@ export default function Settings() {
         }
         fetchProfile();
         return () => { mounted = false; };
-    }, []);
+    }, [user?.id]);
 
     const referralLink = user ? `${window.location.origin}/register?ref=${user.id}` : '';
 
