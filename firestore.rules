@@ -14,8 +14,21 @@ service cloud.firestore {
     
     // User data rules - Multi-tenant isolation
     match /users/{userId} {
-      // Users can only read/write their own profile
-      allow read, write: if isOwner(userId);
+      // Allow any authenticated user to read other users' root profiles
+      // Required for checking referrer existence during registration
+      allow read: if isAuthenticated();
+      
+      // Allow users to create their own profile
+      allow create: if isOwner(userId);
+      
+      // Allow users to update their own profile OR allow a restricted update for referrals
+      allow update: if isOwner(userId) || (
+        isAuthenticated() && 
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['referrals', 'updated_at']) &&
+        request.resource.data.referrals == (resource.data.get('referrals', 0) + 1)
+      );
+      
+      allow delete: if isOwner(userId);
       
       // Accounts subcollection
       match /accounts/{accountId} {
