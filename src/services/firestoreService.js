@@ -407,14 +407,17 @@ export async function recordReferralOnSignup(newUserId, referrerId) {
 
     try {
         await runTransaction(db, async (transaction) => {
-            // Set referredBy on new user's root doc if not already set
+            // 1. ALL READS FIRST
             const newUserSnap = await transaction.get(newUserRef);
+            const refSnap = await transaction.get(referrerRef);
+
+            // 2. ALL WRITES AFTER
+            // Set referredBy on new user's root doc if not already set
             if (!newUserSnap.exists() || !newUserSnap.data().referredBy) {
                 transaction.set(newUserRef, { referredBy: referrerId, created_at: Timestamp.now() }, { merge: true });
             }
 
             // Increment referrer's referrals count
-            const refSnap = await transaction.get(referrerRef);
             if (refSnap.exists()) {
                 const current = refSnap.data().referrals || 0;
                 transaction.update(referrerRef, { referrals: current + 1, updated_at: Timestamp.now() });
