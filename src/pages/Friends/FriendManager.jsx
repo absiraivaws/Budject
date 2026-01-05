@@ -611,7 +611,6 @@ export default function FriendManager() {
                                         <label className="form-label">Amount</label>
                                         <input
                                             type="number"
-                                            step="0.01"
                                             className="form-input"
                                             value={formData.initial_amount}
                                             onChange={(e) => handleChange('initial_amount', e.target.value)}
@@ -759,7 +758,6 @@ export default function FriendManager() {
                         <label className="form-label">Amount *</label>
                         <input
                             type="number"
-                            step="0.01"
                             className="form-input"
                             value={transactionData.amount}
                             onChange={(e) => handleTransactionChange('amount', e.target.value)}

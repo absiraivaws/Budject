@@ -190,7 +190,6 @@ export default function TransactionForm({ transaction, onSave, onCancel }) {
                 <div className="amount-input-group">
                     <input
                         type="number"
-                        step="0.01"
                         className="form-input amount-input"
                         value={formData.amount}
                         onChange={(e) => handleChange('amount', e.target.value)}

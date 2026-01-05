@@ -319,7 +319,6 @@ export default function BudgetManager() {
                         <label className="form-label">Budget Amount *</label>
                         <input
                             type="number"
-                            step="0.01"
                             className="form-input"
                             value={formData.amount}
                             onChange={(e) => handleChange('amount', e.target.value)}
