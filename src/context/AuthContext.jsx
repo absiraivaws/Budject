@@ -86,6 +86,8 @@ export function AuthProvider({ children }) {
     };
 
     const logout = async () => {
+        const { clearAllData } = await import('../services/db.js');
+        await clearAllData();
         await signOut(auth);
     };
 

@@ -122,6 +122,25 @@ export async function updateTransaction(id, updates) {
     return { id, ...updates };
 }
 
+export async function getTransactionsByDateRange(startDate, endDate) {
+    const transactionsRef = getUserCollection('transactions');
+    const q = query(
+        transactionsRef,
+        where('date', '>=', startDate),
+        where('date', '<=', endDate),
+        orderBy('date', 'desc')
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+export async function getTransactionsByAccount(accountId) {
+    const transactionsRef = getUserCollection('transactions');
+    const q = query(transactionsRef, where('account_id', '==', accountId), orderBy('date', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
 export async function deleteTransaction(id) {
     const docRef = getUserDoc('transactions', id);
     await deleteDoc(docRef);
@@ -163,6 +182,13 @@ export async function deleteCategory(id) {
     await deleteDoc(docRef);
 }
 
+export async function getCategoriesByType(type) {
+    const categoriesRef = getUserCollection('categories');
+    const q = query(categoriesRef, where('type', '==', type));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
 // ========================================
 // BUDGET OPERATIONS
 // ========================================
@@ -197,6 +223,13 @@ export async function updateBudget(id, updates) {
 export async function deleteBudget(id) {
     const docRef = getUserDoc('budgets', id);
     await deleteDoc(docRef);
+}
+
+export async function getBudgetsByMonth(month) {
+    const budgetsRef = getUserCollection('budgets');
+    const q = query(budgetsRef, where('month', '==', month));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
 // ========================================
@@ -371,6 +404,19 @@ export async function deleteLedgerEntries(transactionId) {
         batch.delete(docRef);
     });
     await batch.commit();
+}
+
+export async function getLedgerEntriesByAccount(accountId) {
+    const ledgerRef = getUserCollection('ledger');
+    const q = query(ledgerRef, where('account_id', '==', accountId));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+export async function getAllLedgerEntries() {
+    const ledgerRef = getUserCollection('ledger');
+    const snapshot = await getDocs(ledgerRef);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
 // ========================================

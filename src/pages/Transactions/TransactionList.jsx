@@ -12,15 +12,15 @@ import { useCurrency } from '../../context/CurrencyContext.jsx';
 import { TRANSACTION_TYPES } from '../../config/constants.js';
 import './TransactionList.css';
 
+import { useData } from '../../context/DataContext.jsx';
+
 export default function TransactionList() {
     const { currency } = useCurrency();
+    const { transactions, accounts, categories, recurringTransactions, refreshData } = useData();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [transactions, setTransactions] = useState([]);
+    // Local state for filtering results only
     const [filteredTransactions, setFilteredTransactions] = useState([]);
-    const [accounts, setAccounts] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [recurringTransactions, setRecurringTransactions] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
 
@@ -35,10 +35,8 @@ export default function TransactionList() {
         dateTo: getEndOfMonth().toISOString().split('T')[0]
     });
 
-    useEffect(() => {
-        loadData();
-    }, []);
-
+    // We don't need loadData anymore, data comes from context
+    // Just apply filters when data or filters change
     useEffect(() => {
         applyFilters();
     }, [transactions, filters]);
@@ -51,19 +49,6 @@ export default function TransactionList() {
         }
     }, [searchParams]);
 
-    async function loadData() {
-        const [txData, accountsData, categoriesData, recurringData] = await Promise.all([
-            getAllTransactions(),
-            getAllAccounts(),
-            getAllCategories(),
-            getAllRecurringTransactions()
-        ]);
-
-        setTransactions(txData);
-        setAccounts(accountsData);
-        setCategories(categoriesData);
-        setRecurringTransactions(recurringData);
-    }
 
     function applyFilters() {
         let filtered = [...transactions];
@@ -126,7 +111,7 @@ export default function TransactionList() {
     };
 
     const handleSave = async () => {
-        await loadData();
+        await refreshData();
         setIsModalOpen(false);
     };
 
@@ -139,7 +124,7 @@ export default function TransactionList() {
             // Reverse ledger entries before deleting
             await reverseLedgerEntries(deleteConfirm);
             await deleteTransaction(deleteConfirm.id);
-            await loadData();
+            await refreshData();
             setDeleteConfirm(null);
         }
     };
