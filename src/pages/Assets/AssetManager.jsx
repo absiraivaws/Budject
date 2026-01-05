@@ -394,7 +394,6 @@ export default function AssetManager() {
                             <label className="form-label">Value *</label>
                             <input
                                 type="number"
-                                step="0.01"
                                 className="form-input"
                                 value={formData.value}
                                 onChange={(e) => handleChange('value', e.target.value)}

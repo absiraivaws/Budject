@@ -505,7 +505,6 @@ export default function RecurringManager() {
                             <label className="form-label">Amount *</label>
                             <input
                                 type="number"
-                                step="0.01"
                                 className="form-input"
                                 value={formData.amount}
                                 onChange={(e) => handleChange('amount', e.target.value)}
