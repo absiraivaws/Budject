@@ -5,8 +5,11 @@ import { CurrencyProvider } from './context/CurrencyContext.jsx';
 import { FontSizeProvider } from './context/FontSizeContext.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ReminderProvider } from './context/ReminderContext.jsx';
+import { DataProvider } from './context/DataContext.jsx';
+
 import ProtectedRoute from './components/Auth/ProtectedRoute.jsx';
 import ResponsiveLayout from './components/Layout/ResponsiveLayout.jsx';
+
 import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
@@ -21,6 +24,7 @@ import ReportsHub from './pages/Reports/ReportsHub.jsx';
 import AssetManager from './pages/Assets/AssetManager.jsx';
 import FriendManager from './pages/Friends/FriendManager.jsx';
 import Settings from './pages/Settings/Settings.jsx';
+
 import { initDB } from './services/db.js';
 import { initializeTheme } from './services/storageService.js';
 import { processRecurringTransactions } from './services/recurringProcessor.js';
@@ -64,93 +68,95 @@ function App() {
         <CurrencyProvider>
           <AuthProvider>
             <ReminderProvider>
-              <Router>
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
+              <DataProvider>
+                <Router>
+                  <Routes>
+                    {/* Public Routes */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
 
-                  {/* Protected Routes */}
-                  <Route path="/" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <Dashboard />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/transactions" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <TransactionList />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/accounts" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <AccountList />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/categories" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <CategoryManager />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/budgets" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <BudgetManager />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/calendar" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <CalendarView />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/recurring" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <RecurringManager />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/reports" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <ReportsHub />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/assets" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <AssetManager />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/friends" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <FriendManager />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/settings" element={
-                    <ProtectedRoute>
-                      <ResponsiveLayout>
-                        <Settings />
-                      </ResponsiveLayout>
-                    </ProtectedRoute>
-                  } />
-                </Routes>
-              </Router>
+                    {/* Protected Routes */}
+                    <Route path="/" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <Dashboard />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/transactions" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <TransactionList />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/accounts" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <AccountList />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/categories" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <CategoryManager />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/budgets" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <BudgetManager />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/calendar" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <CalendarView />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/recurring" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <RecurringManager />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/reports" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <ReportsHub />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/assets" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <AssetManager />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/friends" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <FriendManager />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/settings" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <Settings />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                  </Routes>
+                </Router>
+              </DataProvider>
             </ReminderProvider>
           </AuthProvider>
         </CurrencyProvider>

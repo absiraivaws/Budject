@@ -2,16 +2,16 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/UI/Card.jsx';
 import Button from '../../components/UI/Button.jsx';
-import { getAllAccounts, getAllTransactions } from '../../services/db.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { formatDate } from '../../utils/dateUtils.js';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
+import { useData } from '../../context/DataContext.jsx';
 import './Dashboard.css';
 
 export default function Dashboard() {
     const { currency } = useCurrency();
-    const [accounts, setAccounts] = useState([]);
-    const [transactions, setTransactions] = useState([]);
+    const { transactions, accounts, refreshData } = useData();
+    const [recentTransactions, setRecentTransactions] = useState([]);
     const [stats, setStats] = useState({
         totalBalance: 0,
         monthlyIncome: 0,
@@ -19,22 +19,18 @@ export default function Dashboard() {
     });
 
     useEffect(() => {
-        loadData();
-    }, []);
+        calculateStats();
+    }, [transactions, accounts]);
 
-    async function loadData() {
-        const accountsData = await getAllAccounts();
-        const transactionsData = await getAllTransactions();
-
-        setAccounts(accountsData);
-        setTransactions(transactionsData.slice(0, 5)); // Latest 5 transactions
+    function calculateStats() {
+        setRecentTransactions(transactions.slice(0, 5)); // Latest 5 transactions
 
         // Calculate stats
-        const totalBalance = accountsData.reduce((sum, acc) => sum + (acc.balance || 0), 0);
+        const totalBalance = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
 
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const monthlyTxs = transactionsData.filter(tx => new Date(tx.date) >= startOfMonth);
+        const monthlyTxs = transactions.filter(tx => new Date(tx.date) >= startOfMonth);
 
         const monthlyIncome = monthlyTxs
             .filter(tx => tx.type === 'income')
@@ -117,13 +113,13 @@ export default function Dashboard() {
 
             {/* Recent Transactions */}
             <Card title="Recent Transactions">
-                {transactions.length === 0 ? (
+                {recentTransactions.length === 0 ? (
                     <div className="empty-state">
                         <p>No transactions yet. Add your first transaction!</p>
                     </div>
                 ) : (
                     <div className="transactions-list">
-                        {transactions.map(tx => (
+                        {recentTransactions.map(tx => (
                             <div key={tx.id} className="transaction-item">
                                 <div className={`transaction-type-indicator ${tx.type}`}></div>
                                 <div className="transaction-info">

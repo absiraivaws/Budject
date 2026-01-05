@@ -182,8 +182,8 @@ export async function validateLedgerBalance(transactionId) {
  * @returns {Promise<number>} Calculated balance
  */
 export async function getAccountBalanceFromLedger(accountId) {
-    const db = await import('./db.js').then(m => m.getDB());
-    const entries = await db.getAllFromIndex('ledger', 'account_id', accountId);
+    const { getLedgerEntriesByAccount } = await import('./firestoreService.js');
+    const entries = await getLedgerEntriesByAccount(accountId);
 
     const balance = entries.reduce((sum, entry) => {
         return sum + (entry.debit || 0) - (entry.credit || 0);
