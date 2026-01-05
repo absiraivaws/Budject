@@ -2,6 +2,18 @@
     max-width: 600px;
 }
 
+/* Hide number input spinners/arrows */
+.account-form input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.account-form input[type="number"]::-webkit-outer-spin-button,
+.account-form input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;

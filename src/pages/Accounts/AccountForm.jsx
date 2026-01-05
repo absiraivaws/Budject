@@ -17,7 +17,7 @@ export default function AccountForm({ account, onSave, onCancel }) {
     const [formData, setFormData] = useState({
         name: account?.name || '',
         type: account?.type || 'cash',
-        balance: account?.balance || 0,
+        balance: account?.balance || '',
         currency: account?.currency || currency,
         color: account?.color || COLOR_PALETTE[0],
         icon: account?.icon || '💵',
@@ -205,7 +205,6 @@ export default function AccountForm({ account, onSave, onCancel }) {
                 </label>
                 <input
                     type="number"
-                    step="0.01"
                     className="form-input"
                     value={formData.balance}
                     onChange={(e) => handleChange('balance', e.target.value)}
@@ -238,7 +237,6 @@ export default function AccountForm({ account, onSave, onCancel }) {
                         <label className="form-label">Credit Limit *</label>
                         <input
                             type="number"
-                            step="0.01"
                             className="form-input"
                             value={formData.credit_limit}
                             onChange={(e) => handleChange('credit_limit', e.target.value)}
@@ -288,7 +286,6 @@ export default function AccountForm({ account, onSave, onCancel }) {
                         <label className="form-label">Principal Amount *</label>
                         <input
                             type="number"
-                            step="0.01"
                             className="form-input"
                             value={formData.fd_principal}
                             onChange={(e) => handleChange('fd_principal', e.target.value)}
@@ -363,7 +360,6 @@ export default function AccountForm({ account, onSave, onCancel }) {
                             <label className="form-label">Principal Amount *</label>
                             <input
                                 type="number"
-                                step="0.01"
                                 className="form-input"
                                 value={formData.loan_principal}
                                 onChange={(e) => handleChange('loan_principal', e.target.value)}
@@ -376,7 +372,6 @@ export default function AccountForm({ account, onSave, onCancel }) {
                             <label className="form-label">Installment Amount *</label>
                             <input
                                 type="number"
-                                step="0.01"
                                 className="form-input"
                                 value={formData.loan_installment}
                                 onChange={(e) => handleChange('loan_installment', e.target.value)}
@@ -390,7 +385,6 @@ export default function AccountForm({ account, onSave, onCancel }) {
                         <label className="form-label">Outstanding Balance</label>
                         <input
                             type="number"
-                            step="0.01"
                             className="form-input"
                             value={formData.loan_outstanding}
                             onChange={(e) => handleChange('loan_outstanding', e.target.value)}
@@ -411,7 +405,6 @@ export default function AccountForm({ account, onSave, onCancel }) {
                             <label className="form-label">Interest Rate (% per year)</label>
                             <input
                                 type="number"
-                                step="0.01"
                                 className="form-input"
                                 value={formData.interest_rate}
                                 onChange={(e) => handleChange('interest_rate', e.target.value)}
