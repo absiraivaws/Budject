@@ -290,7 +290,7 @@ export default function AssetManager() {
                                                 <div className="asset-item-notes">{asset.notes}</div>
                                             )}
                                             <div className="asset-item-date">
-                                                Added: {formatDate(asset.purchase_date, 'short')}
+                                                Added: {asset.purchase_date ? formatDate(asset.purchase_date, 'short') : 'N/A'}
                                             </div>
                                         </div>
                                         <div className="asset-item-value">
@@ -339,7 +339,7 @@ export default function AssetManager() {
                                                 <div className="asset-item-notes">{liability.notes}</div>
                                             )}
                                             <div className="asset-item-date">
-                                                Added: {formatDate(liability.purchase_date, 'short')}
+                                                Added: {liability.purchase_date ? formatDate(liability.purchase_date, 'short') : 'N/A'}
                                             </div>
                                         </div>
                                         <div className="asset-item-value text-danger">

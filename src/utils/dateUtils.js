@@ -9,7 +9,9 @@
  * @returns {string} Formatted date
  */
 export function formatDate(date, format = 'medium') {
+    if (!date) return 'N/A';
     const d = new Date(date);
+    if (isNaN(d.getTime())) return 'Invalid Date';
 
     const options = {
         short: { month: 'short', day: 'numeric' },
