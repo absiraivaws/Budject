@@ -18,6 +18,13 @@ import {
 import { formatCurrency } from '../../utils/currency.js';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
 import { formatDate } from '../../utils/dateUtils.js';
+import {
+    generateLendingReminderMessage,
+    generateBorrowingReminderMessage,
+    openWhatsAppLink,
+    isValidPhoneNumber
+} from '../../services/whatsappLinkService.js';
+import { getWhatsAppSettings } from '../../services/storageService.js';
 import './FriendManager.css';
 
 export default function FriendManager() {
@@ -33,6 +40,7 @@ export default function FriendManager() {
     const [formData, setFormData] = useState({
         name: '',
         contact: '',
+        whatsapp_number: '',
         notes: '',
         // Financial fields
         initial_amount: '',
@@ -75,6 +83,7 @@ export default function FriendManager() {
         setFormData({
             name: '',
             contact: '',
+            whatsapp_number: '',
             notes: '',
             initial_amount: '',
             initial_type: 'lend',
@@ -92,6 +101,7 @@ export default function FriendManager() {
         setFormData({
             name: friend.name,
             contact: friend.contact || '',
+            whatsapp_number: friend.whatsapp_number || '',
             notes: friend.notes || ''
         });
         setIsModalOpen(true);
@@ -157,6 +167,7 @@ export default function FriendManager() {
             await updateFriend(editingFriend.id, {
                 name: formData.name,
                 contact: formData.contact,
+                whatsapp_number: formData.whatsapp_number,
                 notes: formData.notes
             });
         } else {
@@ -173,6 +184,7 @@ export default function FriendManager() {
             const newFriend = await addFriend({
                 name: formData.name,
                 contact: formData.contact,
+                whatsapp_number: formData.whatsapp_number,
                 notes: formData.notes,
                 initial_amount: hasInitialAmount ? amount : 0,
                 initial_type: formData.initial_type,
@@ -412,6 +424,78 @@ export default function FriendManager() {
         return account ? `${account.icon} ${account.name} ` : 'Unknown';
     };
 
+    // WhatsApp Contact Picker
+    const handlePickContact = async () => {
+        if ('contacts' in navigator && 'ContactsManager' in window) {
+            try {
+                const props = ['tel'];
+                const opts = { multiple: false };
+                const contacts = await navigator.contacts.select(props, opts);
+
+                if (contacts.length > 0 && contacts[0].tel.length > 0) {
+                    handleChange('whatsapp_number', contacts[0].tel[0]);
+                }
+            } catch (error) {
+                console.error('Contact picker error:', error);
+                alert('Contact picker not available. Please enter number manually.');
+            }
+        } else {
+            alert('Contact picker not supported on this device. Please enter number manually.');
+        }
+    };
+
+    // Send WhatsApp Reminder
+    const handleSendWhatsAppReminder = async (friend) => {
+        if (!friend.whatsapp_number) {
+            alert('No WhatsApp number saved for this friend. Please add their WhatsApp number first.');
+            return;
+        }
+
+        if (!isValidPhoneNumber(friend.whatsapp_number)) {
+            alert('Invalid WhatsApp number. Please update the friend\'s WhatsApp number.');
+            return;
+        }
+
+        const isLending = friend.balance > 0; // Positive balance means friend owes money
+        const amount = Math.abs(friend.balance);
+
+        if (amount === 0) {
+            alert('No outstanding balance with this friend.');
+            return;
+        }
+
+        let message;
+        if (isLending) {
+            // Friend owes money to user
+            message = generateLendingReminderMessage(
+                friend.name,
+                amount,
+                friend.return_date,
+                currency
+            );
+        } else {
+            // User owes money to friend
+            message = generateBorrowingReminderMessage(
+                friend.name,
+                amount,
+                friend.return_date,
+                currency
+            );
+        }
+
+        // Update last reminder sent timestamp
+        await updateFriend(friend.id, {
+            ...friend,
+            last_reminder_sent: new Date().toISOString()
+        });
+
+        // Open WhatsApp with pre-filled message
+        openWhatsAppLink(friend.whatsapp_number, message);
+
+        // Reload data to update UI
+        await loadData();
+    };
+
     const totalLent = friends.reduce((sum, f) => sum + (f.total_lent || 0), 0);
     const totalBorrowed = friends.reduce((sum, f) => sum + (f.total_borrowed || 0), 0);
     const netBalance = totalLent - totalBorrowed;
@@ -505,6 +589,16 @@ export default function FriendManager() {
                                     </div>
                                 </div>
                                 <div className="friend-actions">
+                                    {friend.whatsapp_number && friend.balance !== 0 && (
+                                        <Button
+                                            variant="success"
+                                            size="sm"
+                                            onClick={() => handleSendWhatsAppReminder(friend)}
+                                            title="Send WhatsApp Reminder"
+                                        >
+                                            📱 Remind
+                                        </Button>
+                                    )}
                                     <Button variant="primary" size="sm" onClick={() => handleAddTransaction(friend)}>
                                         💸 Transaction
                                     </Button>
@@ -565,6 +659,32 @@ export default function FriendManager() {
                                 onChange={(e) => handleChange('contact', e.target.value)}
                                 placeholder="Phone or email"
                             />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">WhatsApp Number (Optional)</label>
+                            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+                                <input
+                                    type="tel"
+                                    className="form-input"
+                                    value={formData.whatsapp_number}
+                                    onChange={(e) => handleChange('whatsapp_number', e.target.value)}
+                                    placeholder="+94771234567"
+                                    style={{ flex: 1 }}
+                                />
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={handlePickContact}
+                                    title="Pick from contacts"
+                                    type="button"
+                                >
+                                    📇
+                                </Button>
+                            </div>
+                            <small style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
+                                Format: +[country code][number] (e.g., +94771234567)
+                            </small>
                         </div>
 
                         <div className="form-group">

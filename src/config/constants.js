@@ -130,6 +130,7 @@ export const STORAGE_KEYS = {
   CURRENCY: 'budject_currency',
   LANGUAGE: 'budject_language',
   DAILY_REMINDER: 'budject_daily_reminder',
+  WHATSAPP_REMINDER: 'budject_whatsapp_reminder',
   SMS_TRAINING_DATA: 'spendex_sms_training',
   SMS_PATTERNS: 'spendex_sms_patterns'
 };

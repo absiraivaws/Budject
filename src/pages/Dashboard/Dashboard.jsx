@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/UI/Card.jsx';
 import Button from '../../components/UI/Button.jsx';
+import BulkReminderButton from '../../components/BulkReminderButton/BulkReminderButton.jsx';
+import { getAllFriends, updateFriend } from '../../services/db.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { formatDate } from '../../utils/dateUtils.js';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
@@ -12,6 +14,7 @@ export default function Dashboard() {
     const { currency } = useCurrency();
     const { transactions, accounts, refreshData } = useData();
     const [recentTransactions, setRecentTransactions] = useState([]);
+    const [friends, setFriends] = useState([]);
     const [stats, setStats] = useState({
         totalBalance: 0,
         monthlyIncome: 0,
@@ -19,8 +22,17 @@ export default function Dashboard() {
     });
 
     useEffect(() => {
+        loadFriends();
+    }, []);
+
+    useEffect(() => {
         calculateStats();
     }, [transactions, accounts]);
+
+    async function loadFriends() {
+        const friendsData = await getAllFriends();
+        setFriends(friendsData);
+    }
 
     function calculateStats() {
         setRecentTransactions(transactions.slice(0, 5)); // Latest 5 transactions
@@ -43,10 +55,19 @@ export default function Dashboard() {
         setStats({ totalBalance, monthlyIncome, monthlyExpense });
     }
 
+    const handleReminderSent = async (friend) => {
+        await updateFriend(friend.id, {
+            ...friend,
+            last_reminder_sent: new Date().toISOString()
+        });
+        await loadFriends();
+    };
+
     return (
         <div className="dashboard fade-in">
             <div className="dashboard-header">
                 <h1>Dashboard</h1>
+                <BulkReminderButton friends={friends} onReminderSent={handleReminderSent} />
             </div>
 
             {/* Stats Cards */}

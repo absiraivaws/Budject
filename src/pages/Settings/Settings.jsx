@@ -11,8 +11,9 @@ import SMSParserTraining from '../../components/SMSParser/SMSParserTraining.jsx'
 import { CURRENCIES, REMINDER_TIMES } from '../../config/constants.js';
 import { exportAllData, importData, clearAllData } from '../../services/db.js';
 import { getUserRoot } from '../../services/firestoreService.js';
-import { getDailyReminderSettings, setDailyReminderSettings } from '../../services/storageService.js';
+import { getDailyReminderSettings, setDailyReminderSettings, getWhatsAppSettings, setWhatsAppSettings } from '../../services/storageService.js';
 import { requestNotificationPermission, getNotificationPermission, isNotificationSupported } from '../../services/notificationService.js';
+import { isValidPhoneNumber } from '../../services/whatsappLinkService.js';
 import './Settings.css';
 
 export default function Settings() {
@@ -29,6 +30,15 @@ export default function Settings() {
     });
     const [reminderSettings, setReminderSettings] = useState(() => getDailyReminderSettings());
     const [notificationPermission, setNotificationPermission] = useState(() => getNotificationPermission() || 'default');
+    const [whatsappSettings, setWhatsappSettings] = useState(() => ({
+        userWhatsappNumber: '',
+        whatsappRemindersEnabled: false,
+        reminderTime: '09:00',
+        reminderCycleHours: 24,
+        reminderDaysBefore: 3,
+        ...getWhatsAppSettings()
+    }));
+    const [whatsappSaved, setWhatsappSaved] = useState(false);
 
     const handleExport = async () => {
         try {
@@ -165,6 +175,39 @@ export default function Settings() {
         } else if (permission === 'denied') {
             alert('❌ Notification permission denied. You can enable it in your browser settings.');
 
+        }
+    };
+
+    // WhatsApp Settings Handlers
+    const updateWhatsAppSetting = (key, value) => {
+        const newSettings = {
+            ...whatsappSettings,
+            [key]: value
+        };
+        setWhatsappSettings(newSettings);
+        setWhatsAppSettings(newSettings);
+
+        // Show saved indicator
+        setWhatsappSaved(true);
+        setTimeout(() => setWhatsappSaved(false), 2000);
+    };
+
+    const handlePickUserContact = async () => {
+        if ('contacts' in navigator && 'ContactsManager' in window) {
+            try {
+                const props = ['tel'];
+                const opts = { multiple: false };
+                const contacts = await navigator.contacts.select(props, opts);
+
+                if (contacts.length > 0 && contacts[0].tel.length > 0) {
+                    updateWhatsAppSetting('userWhatsappNumber', contacts[0].tel[0]);
+                }
+            } catch (error) {
+                console.error('Contact picker error:', error);
+                alert('Contact picker not available. Please enter number manually.');
+            }
+        } else {
+            alert('Contact picker not supported on this device. Please enter number manually.');
         }
     };
 
@@ -333,6 +376,111 @@ export default function Settings() {
                                         </Button>
                                     )}
                                 </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </Card>
+
+            {/* WhatsApp Reminders */}
+            <Card title={`📱 WhatsApp Reminders ${whatsappSaved ? '✓ Saved' : ''}`}>
+                <div className="settings-section">
+                    <div className="setting-item">
+                        <div className="setting-info">
+                            <div className="setting-label">Your WhatsApp Number</div>
+                            <div className="setting-description">
+                                This number will receive reminders for money you borrowed
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center', minWidth: '300px' }}>
+                            <input
+                                type="tel"
+                                className="form-input"
+                                value={whatsappSettings.userWhatsappNumber}
+                                onChange={(e) => updateWhatsAppSetting('userWhatsappNumber', e.target.value)}
+                                placeholder="+94771234567"
+                                style={{ flex: 1 }}
+                            />
+                            <Button
+                                variant="secondary"
+                                onClick={handlePickUserContact}
+                                title="Pick from contacts"
+                                style={{ fontSize: '1.25rem', padding: '0.5rem 0.75rem' }}
+                            >
+                                📇
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="setting-item">
+                        <div className="setting-info">
+                            <div className="setting-label">Enable WhatsApp Reminders</div>
+                            <div className="setting-description">
+                                Get WhatsApp reminders for lending and borrowing
+                            </div>
+                        </div>
+                        <label className="toggle-switch">
+                            <input
+                                type="checkbox"
+                                checked={whatsappSettings.whatsappRemindersEnabled}
+                                onChange={(e) => updateWhatsAppSetting('whatsappRemindersEnabled', e.target.checked)}
+                            />
+                            <span className="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    {whatsappSettings.whatsappRemindersEnabled && (
+                        <>
+                            <div className="setting-item">
+                                <div className="setting-info">
+                                    <div className="setting-label">Reminder Time (24h format)</div>
+                                    <div className="setting-description">
+                                        Time to check for pending reminders
+                                    </div>
+                                </div>
+                                <input
+                                    type="time"
+                                    className="form-input"
+                                    value={whatsappSettings.reminderTime}
+                                    onChange={(e) => updateWhatsAppSetting('reminderTime', e.target.value)}
+                                    style={{ maxWidth: '150px' }}
+                                />
+                            </div>
+
+                            <div className="setting-item">
+                                <div className="setting-info">
+                                    <div className="setting-label">Reminder Cycle (hours)</div>
+                                    <div className="setting-description">
+                                        Minimum hours between reminders to same person
+                                    </div>
+                                </div>
+                                <input
+                                    type="number"
+                                    className="form-input"
+                                    value={whatsappSettings.reminderCycleHours}
+                                    onChange={(e) => updateWhatsAppSetting('reminderCycleHours', parseInt(e.target.value) || 1)}
+                                    min="1"
+                                    max="720"
+                                    style={{ maxWidth: '150px' }}
+                                />
+                            </div>
+
+                            <div className="setting-item">
+                                <div className="setting-info">
+                                    <div className="setting-label">Days Before Due Date</div>
+                                    <div className="setting-description">
+                                        Start sending reminders this many days before due date
+                                    </div>
+                                </div>
+                                <input
+                                    type="number"
+                                    className="form-input"
+                                    value={whatsappSettings.reminderDaysBefore}
+                                    onChange={(e) => updateWhatsAppSetting('reminderDaysBefore', parseInt(e.target.value) || 0)}
+                                    min="0"
+                                    max="30"
+                                    style={{ maxWidth: '150px' }}
+                                />
                             </div>
                         </>
                     )}

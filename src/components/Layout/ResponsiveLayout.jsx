@@ -1,13 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDeviceType } from '../../hooks/useMediaQuery.js';
 import BottomNav from '../Navigation/BottomNav.jsx';
 import SideNav from '../Navigation/SideNav.jsx';
+import WhatsAppReminderPopup from '../WhatsAppReminderPopup/WhatsAppReminderPopup.jsx';
+import { getAllFriends, updateFriend } from '../../services/db.js';
+import { getPendingReminders, shouldShowReminderPopup } from '../../services/whatsappReminderService.js';
+import { getWhatsAppSettings, setWhatsAppSettings } from '../../services/storageService.js';
+import {
+    generateLendingReminderMessage,
+    generateBorrowingReminderMessage,
+    openWhatsAppLink
+} from '../../services/whatsappLinkService.js';
+import { useCurrency } from '../../context/CurrencyContext.jsx';
 import './ResponsiveLayout.css';
 import ThemeToggle from '../UI/ThemeToggle.jsx';
 
 export default function ResponsiveLayout({ children }) {
     const deviceType = useDeviceType();
+    const { currency } = useCurrency();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [showReminderPopup, setShowReminderPopup] = useState(false);
+    const [pendingReminders, setPendingReminders] = useState({ lending: [], borrowing: [] });
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -15,6 +28,68 @@ export default function ResponsiveLayout({ children }) {
 
     const closeSidebar = () => {
         setIsSidebarOpen(false);
+    };
+
+    // Check for pending WhatsApp reminders on mount
+    useEffect(() => {
+        const checkReminders = async () => {
+            const settings = getWhatsAppSettings();
+
+            if (!shouldShowReminderPopup(settings, settings.lastPopupShown)) {
+                return;
+            }
+
+            const friends = await getAllFriends();
+            const reminders = await getPendingReminders(friends, settings);
+
+            if (reminders.lending.length > 0 || reminders.borrowing.length > 0) {
+                setPendingReminders(reminders);
+                setShowReminderPopup(true);
+
+                // Update last popup shown timestamp
+                setWhatsAppSettings({
+                    ...settings,
+                    lastPopupShown: new Date().toISOString()
+                });
+            }
+        };
+
+        checkReminders();
+    }, []);
+
+    const handleSendReminder = async (friend, type) => {
+        const isLending = type === 'lending';
+        const amount = Math.abs(friend.balance);
+
+        let message;
+        if (isLending) {
+            message = generateLendingReminderMessage(
+                friend.name,
+                amount,
+                friend.return_date,
+                currency
+            );
+        } else {
+            message = generateBorrowingReminderMessage(
+                friend.name,
+                amount,
+                friend.return_date,
+                currency
+            );
+        }
+
+        // Update last reminder sent timestamp
+        await updateFriend(friend.id, {
+            ...friend,
+            last_reminder_sent: new Date().toISOString()
+        });
+
+        // Open WhatsApp
+        openWhatsAppLink(friend.whatsapp_number, message);
+    };
+
+    const handleCloseReminderPopup = () => {
+        setShowReminderPopup(false);
     };
 
     return (
@@ -62,6 +137,15 @@ export default function ResponsiveLayout({ children }) {
             </main>
 
             {deviceType === 'mobile' && <BottomNav />}
+
+            {/* WhatsApp Reminder Popup */}
+            {showReminderPopup && (
+                <WhatsAppReminderPopup
+                    pendingReminders={pendingReminders}
+                    onClose={handleCloseReminderPopup}
+                    onSendReminder={handleSendReminder}
+                />
+            )}
         </div>
     );
 }

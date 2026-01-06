@@ -52,6 +52,30 @@ export function setDailyReminderSettings(settings) {
     localStorage.setItem(STORAGE_KEYS.DAILY_REMINDER, JSON.stringify(settings));
 }
 
+export function getWhatsAppSettings() {
+    const saved = localStorage.getItem(STORAGE_KEYS.WHATSAPP_REMINDER);
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            console.error('Failed to parse WhatsApp settings:', e);
+        }
+    }
+    // Default settings
+    return {
+        userWhatsappNumber: '',
+        whatsappRemindersEnabled: false,
+        reminderTime: '09:00',
+        reminderCycleHours: 24,
+        reminderDaysBefore: 3,
+        lastPopupShown: null
+    };
+}
+
+export function setWhatsAppSettings(settings) {
+    localStorage.setItem(STORAGE_KEYS.WHATSAPP_REMINDER, JSON.stringify(settings));
+}
+
 // Initialize theme on app load
 export function initializeTheme() {
     const theme = getTheme();
