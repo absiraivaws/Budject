@@ -159,9 +159,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  /* Ensure text wraps properly on all screen sizes */
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  /* Allow text to wrap at word boundaries, not break every character */
+  overflow-wrap: anywhere;
 }
 
 html {

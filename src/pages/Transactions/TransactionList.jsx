@@ -23,6 +23,8 @@ export default function TransactionList() {
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [selectedTransactions, setSelectedTransactions] = useState(new Set());
+    const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
 
     const [filters, setFilters] = useState({
         type: 'all',
@@ -127,6 +129,42 @@ export default function TransactionList() {
             await refreshData();
             setDeleteConfirm(null);
         }
+    };
+
+    const toggleSelection = (txId) => {
+        const newSelection = new Set(selectedTransactions);
+        if (newSelection.has(txId)) {
+            newSelection.delete(txId);
+        } else {
+            newSelection.add(txId);
+        }
+        setSelectedTransactions(newSelection);
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedTransactions.size === filteredTransactions.length) {
+            setSelectedTransactions(new Set());
+        } else {
+            setSelectedTransactions(new Set(filteredTransactions.map(tx => tx.id)));
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedTransactions.size === 0) return;
+        setShowBulkDeleteConfirm(true);
+    };
+
+    const confirmBulkDelete = async () => {
+        for (const txId of selectedTransactions) {
+            const tx = transactions.find(t => t.id === txId);
+            if (tx) {
+                await reverseLedgerEntries(tx);
+                await deleteTransaction(txId);
+            }
+        }
+        await refreshData();
+        setSelectedTransactions(new Set());
+        setShowBulkDeleteConfirm(false);
     };
 
     const getAccountName = (accountId) => {
@@ -297,80 +335,115 @@ export default function TransactionList() {
                         <p>Add your first transaction to start tracking your finances</p>
                     </div>
                 ) : (
-                    <div className="transactions-list">
-                        {filteredTransactions.map(tx => (
-                            <div key={tx.id} className={`transaction-item ${tx.type}`}>
-                                <div className={`transaction-type-indicator ${tx.type}`}></div>
+                    <>
+                        {/* Bulk Actions */}
+                        <div className="bulk-actions">
+                            <label className="select-all-container">
+                                <input
+                                    type="checkbox"
+                                    className="transaction-checkbox"
+                                    checked={selectedTransactions.size === filteredTransactions.length && filteredTransactions.length > 0}
+                                    onChange={toggleSelectAll}
+                                />
+                                <span>Select All</span>
+                            </label>
+                            {selectedTransactions.size > 0 && (
+                                <>
+                                    <span className="selected-count">
+                                        {selectedTransactions.size} selected
+                                    </span>
+                                    <Button
+                                        variant="danger"
+                                        size="sm"
+                                        onClick={handleBulkDelete}
+                                    >
+                                        🗑️ Delete Selected
+                                    </Button>
+                                </>
+                            )}
+                        </div>
 
-                                <div className="transaction-main">
-                                    <div className="transaction-info">
-                                        <div className="transaction-description">
-                                            {tx.notes || 'No description'}
-                                            {tx.is_auto_generated && (
-                                                <span
-                                                    className="recurring-badge"
-                                                    title="Auto-generated from recurring transaction"
-                                                >
-                                                    🔄
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="transaction-meta">
-                                            <span className="transaction-date">{formatDate(tx.date, 'medium')}</span>
-                                            <span className="transaction-separator">•</span>
-                                            <span className="transaction-account">{getAccountName(tx.account_id)}</span>
-                                            {tx.type !== TRANSACTION_TYPES.TRANSFER && (
-                                                <>
-                                                    <span className="transaction-separator">•</span>
-                                                    <span className="transaction-category">{getCategoryName(tx.category_id)}</span>
-                                                </>
-                                            )}
-                                            {tx.type === TRANSACTION_TYPES.TRANSFER && (
-                                                <>
-                                                    <span className="transaction-separator">→</span>
-                                                    <span className="transaction-account">{getAccountName(tx.to_account_id)}</span>
-                                                </>
-                                            )}
-                                            {tx.recurring_id && (
-                                                <>
-                                                    <span className="transaction-separator">•</span>
-                                                    <button
-                                                        className="view-recurring-link"
-                                                        onClick={() => navigate(`/recurring?highlight=${tx.recurring_id}`)}
-                                                        title="View recurring rule"
+                        <div className="transactions-list">
+                            {filteredTransactions.map(tx => (
+                                <div key={tx.id} className={`transaction-item ${tx.type}`}>
+                                    <input
+                                        type="checkbox"
+                                        className="transaction-checkbox"
+                                        checked={selectedTransactions.has(tx.id)}
+                                        onChange={() => toggleSelection(tx.id)}
+                                    />
+                                    <div className={`transaction-type-indicator ${tx.type}`}></div>
+
+                                    <div className="transaction-main">
+                                        <div className="transaction-info">
+                                            <div className="transaction-description">
+                                                {tx.notes || 'No description'}
+                                                {tx.is_auto_generated && (
+                                                    <span
+                                                        className="recurring-badge"
+                                                        title="Auto-generated from recurring transaction"
                                                     >
-                                                        View Rule
-                                                    </button>
-                                                </>
+                                                        🔄
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="transaction-meta">
+                                                <span className="transaction-date">{formatDate(tx.date, 'medium')}</span>
+                                                <span className="transaction-separator">•</span>
+                                                <span className="transaction-account">{getAccountName(tx.account_id)}</span>
+                                                {tx.type !== TRANSACTION_TYPES.TRANSFER && (
+                                                    <>
+                                                        <span className="transaction-separator">•</span>
+                                                        <span className="transaction-category">{getCategoryName(tx.category_id)}</span>
+                                                    </>
+                                                )}
+                                                {tx.type === TRANSACTION_TYPES.TRANSFER && (
+                                                    <>
+                                                        <span className="transaction-separator">→</span>
+                                                        <span className="transaction-account">{getAccountName(tx.to_account_id)}</span>
+                                                    </>
+                                                )}
+                                                {tx.recurring_id && (
+                                                    <>
+                                                        <span className="transaction-separator">•</span>
+                                                        <button
+                                                            className="view-recurring-link"
+                                                            onClick={() => navigate(`/recurring?highlight=${tx.recurring_id}`)}
+                                                            title="View recurring rule"
+                                                        >
+                                                            View Rule
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
+                                            {tx.tags && (
+                                                <div className="transaction-tags">
+                                                    {tx.tags.split(',').map((tag, i) => (
+                                                        <span key={i} className="tag">{tag.trim()}</span>
+                                                    ))}
+                                                </div>
                                             )}
                                         </div>
-                                        {tx.tags && (
-                                            <div className="transaction-tags">
-                                                {tx.tags.split(',').map((tag, i) => (
-                                                    <span key={i} className="tag">{tag.trim()}</span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
 
-                                    <div className="transaction-actions">
-                                        <div className={`transaction-amount ${tx.type}`}>
-                                            {tx.type === TRANSACTION_TYPES.INCOME && '+'}
-                                            {tx.type === TRANSACTION_TYPES.EXPENSE && '-'}
-                                            {formatCurrency(tx.amount, currency)}
+                                        <div className="transaction-actions">
+                                            <div className={`transaction-amount ${tx.type}`}>
+                                                {tx.type === TRANSACTION_TYPES.INCOME && '+'}
+                                                {tx.type === TRANSACTION_TYPES.EXPENSE && '-'}
+                                                {formatCurrency(tx.amount, currency)}
+                                            </div>
+                                            <button
+                                                className="transaction-delete-btn"
+                                                onClick={() => handleDelete(tx)}
+                                                title="Delete"
+                                            >
+                                                🗑️
+                                            </button>
                                         </div>
-                                        <button
-                                            className="transaction-delete-btn"
-                                            onClick={() => handleDelete(tx)}
-                                            title="Delete"
-                                        >
-                                            🗑️
-                                        </button>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    </>
                 )}
             </Card>
 
@@ -404,6 +477,27 @@ export default function TransactionList() {
                     </Button>
                     <Button variant="danger" onClick={confirmDelete}>
                         Delete Transaction
+                    </Button>
+                </div>
+            </Modal>
+
+            {/* Bulk Delete Confirmation Modal */}
+            <Modal
+                isOpen={showBulkDeleteConfirm}
+                onClose={() => setShowBulkDeleteConfirm(false)}
+                title="Delete Multiple Transactions"
+                size="sm"
+            >
+                <div className="delete-confirm">
+                    <p>Are you sure you want to delete {selectedTransactions.size} transaction{selectedTransactions.size > 1 ? 's' : ''}?</p>
+                    <p className="text-danger text-sm">This will reverse all ledger entries and cannot be undone.</p>
+                </div>
+                <div className="modal-footer">
+                    <Button variant="secondary" onClick={() => setShowBulkDeleteConfirm(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={confirmBulkDelete}>
+                        Delete {selectedTransactions.size} Transaction{selectedTransactions.size > 1 ? 's' : ''}
                     </Button>
                 </div>
             </Modal>

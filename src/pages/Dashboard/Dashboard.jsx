@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import Card from '../../components/UI/Card.jsx';
 import Button from '../../components/UI/Button.jsx';
 import BulkReminderButton from '../../components/BulkReminderButton/BulkReminderButton.jsx';
@@ -8,13 +11,62 @@ import { formatCurrency } from '../../utils/currency.js';
 import { formatDate } from '../../utils/dateUtils.js';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
 import { useData } from '../../context/DataContext.jsx';
+import { useDragDropOrder } from '../../hooks/useDragDropOrder.js';
 import './Dashboard.css';
+
+// Sortable Account Item Component
+function SortableAccountItem({ account, currency }) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id: account.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        cursor: 'grab'
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
+            className="account-item"
+        >
+            <div className="account-icon" style={{ background: account.color }}>
+                {account.icon}
+            </div>
+            <div className="account-info">
+                <div className="account-name">{account.name}</div>
+                <div className="account-type">{account.type}</div>
+            </div>
+            <div className="account-balance">
+                {formatCurrency(account.balance || 0, currency)}
+            </div>
+        </div>
+    );
+}
 
 export default function Dashboard() {
     const { currency } = useCurrency();
     const { transactions, accounts, refreshData } = useData();
     const [recentTransactions, setRecentTransactions] = useState([]);
     const [friends, setFriends] = useState([]);
+    const { orderedItems: orderedAccounts, handleDragEnd } = useDragDropOrder(accounts, 'dashboard-accounts-order');
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8, // 8px movement required to start drag
+            },
+        })
+    );
     const [stats, setStats] = useState({
         totalBalance: 0,
         monthlyIncome: 0,
@@ -113,22 +165,26 @@ export default function Dashboard() {
                         </Link>
                     </div>
                 ) : (
-                    <div className="accounts-list">
-                        {accounts.map(account => (
-                            <div key={account.id} className="account-item">
-                                <div className="account-icon" style={{ background: account.color }}>
-                                    {account.icon}
-                                </div>
-                                <div className="account-info">
-                                    <div className="account-name">{account.name}</div>
-                                    <div className="account-type">{account.type}</div>
-                                </div>
-                                <div className="account-balance">
-                                    {formatCurrency(account.balance || 0, currency)}
-                                </div>
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={orderedAccounts.map(a => a.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <div className="accounts-list">
+                                {orderedAccounts.map(account => (
+                                    <SortableAccountItem
+                                        key={account.id}
+                                        account={account}
+                                        currency={currency}
+                                    />
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </SortableContext>
+                    </DndContext>
                 )}
             </Card>
 

@@ -72,11 +72,33 @@
     color: var(--color-text-secondary);
 }
 
-/* Accounts Grid */
+/* Accounts Grid - Responsive */
 .accounts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--spacing-lg);
+    /* Default: 1 column on mobile */
+    grid-template-columns: 1fr;
+}
+
+/* 2 columns on tablet */
+@media (min-width: 768px) {
+    .accounts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 3 columns on desktop */
+@media (min-width: 1024px) {
+    .accounts-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* 4 columns on large desktop */
+@media (min-width: 1440px) {
+    .accounts-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .account-card {
