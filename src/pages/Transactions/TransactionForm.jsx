@@ -16,6 +16,7 @@ export default function TransactionForm({ transaction, onSave, onCancel }) {
     const [showSMSImport, setShowSMSImport] = useState(false);
     const [accounts, setAccounts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [formData, setFormData] = useState({
         type: transaction?.type || TRANSACTION_TYPES.EXPENSE,
@@ -115,6 +116,9 @@ export default function TransactionForm({ transaction, onSave, onCancel }) {
 
         if (!validate()) return;
 
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+
         try {
             // Create transaction
             const newTransaction = await addTransaction({
@@ -129,6 +133,8 @@ export default function TransactionForm({ transaction, onSave, onCancel }) {
         } catch (error) {
             console.error('Error creating transaction:', error);
             setErrors({ submit: 'Failed to create transaction. Please try again.' });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -324,11 +330,13 @@ export default function TransactionForm({ transaction, onSave, onCancel }) {
 
             {/* Form Actions */}
             <div className="form-actions">
-                <Button type="button" variant="secondary" onClick={onCancel}>
+                <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
                     Cancel
                 </Button>
-                <Button type="submit" variant="primary">
-                    {transaction ? 'Update Transaction' : 'Add Transaction'}
+                <Button type="submit" variant="primary" disabled={isSubmitting}>
+                    {isSubmitting
+                        ? (transaction ? 'Updating...' : 'Adding...')
+                        : (transaction ? 'Update Transaction' : 'Add Transaction')}
                 </Button>
             </div>
         </form>
