@@ -53,55 +53,67 @@ export default function TransactionList() {
 
 
     function applyFilters() {
-        let filtered = [...transactions];
+        try {
+            // Safety check for transactions array
+            if (!Array.isArray(transactions)) {
+                console.warn('Transactions is not an array:', transactions);
+                setFilteredTransactions([]);
+                return;
+            }
 
-        // Type filter
-        if (filters.type !== 'all') {
-            filtered = filtered.filter(tx => tx.type === filters.type);
-        }
+            let filtered = [...transactions];
 
-        // Account filter
-        if (filters.account !== 'all') {
-            filtered = filtered.filter(tx =>
-                tx.account_id === filters.account || tx.to_account_id === filters.account
-            );
-        }
+            // Type filter
+            if (filters.type !== 'all') {
+                filtered = filtered.filter(tx => tx.type === filters.type);
+            }
 
-        // Category filter
-        if (filters.category !== 'all') {
-            filtered = filtered.filter(tx => tx.category_id === filters.category);
-        }
+            // Account filter
+            if (filters.account !== 'all') {
+                filtered = filtered.filter(tx =>
+                    tx.account_id === filters.account || tx.to_account_id === filters.account
+                );
+            }
 
-        // Recurring filter
-        if (filters.recurring === 'recurring') {
-            filtered = filtered.filter(tx => tx.is_auto_generated === true);
-        } else if (filters.recurring === 'manual') {
-            filtered = filtered.filter(tx => !tx.is_auto_generated);
-        }
+            // Category filter
+            if (filters.category !== 'all') {
+                filtered = filtered.filter(tx => tx.category_id === filters.category);
+            }
 
-        // Specific recurring ID filter
-        if (filters.recurringId) {
-            filtered = filtered.filter(tx => tx.recurring_id === filters.recurringId);
-        }
+            // Recurring filter
+            if (filters.recurring === 'recurring') {
+                filtered = filtered.filter(tx => tx.is_auto_generated === true);
+            } else if (filters.recurring === 'manual') {
+                filtered = filtered.filter(tx => !tx.is_auto_generated);
+            }
 
-        // Search filter
-        if (filters.search) {
-            const searchLower = filters.search.toLowerCase();
-            filtered = filtered.filter(tx =>
-                tx.notes?.toLowerCase().includes(searchLower) ||
-                tx.tags?.toLowerCase().includes(searchLower)
-            );
-        }
+            // Specific recurring ID filter
+            if (filters.recurringId) {
+                filtered = filtered.filter(tx => tx.recurring_id === filters.recurringId);
+            }
 
-        // Date range filter
-        if (filters.dateFrom) {
-            filtered = filtered.filter(tx => tx.date >= filters.dateFrom);
-        }
-        if (filters.dateTo) {
-            filtered = filtered.filter(tx => tx.date <= filters.dateTo);
-        }
+            // Search filter
+            if (filters.search) {
+                const searchLower = filters.search.toLowerCase();
+                filtered = filtered.filter(tx =>
+                    (tx.notes && tx.notes.toLowerCase().includes(searchLower)) ||
+                    (tx.tags && tx.tags.toLowerCase().includes(searchLower))
+                );
+            }
 
-        setFilteredTransactions(filtered);
+            // Date range filter
+            if (filters.dateFrom) {
+                filtered = filtered.filter(tx => tx.date >= filters.dateFrom);
+            }
+            if (filters.dateTo) {
+                filtered = filtered.filter(tx => tx.date <= filters.dateTo);
+            }
+
+            setFilteredTransactions(filtered);
+        } catch (error) {
+            console.error('Error applying filters:', error);
+            setFilteredTransactions([]);
+        }
     }
 
     const handleFilterChange = (field, value) => {
