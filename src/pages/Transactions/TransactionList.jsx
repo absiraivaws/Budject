@@ -125,8 +125,13 @@ export default function TransactionList() {
     };
 
     const handleSave = async () => {
-        await refreshData();
+        // Close immediately after a successful add
         setIsModalOpen(false);
+        try {
+            await refreshData();
+        } catch (error) {
+            console.error('Error refreshing data after transaction save:', error);
+        }
     };
 
     const handleDelete = async (transaction) => {
