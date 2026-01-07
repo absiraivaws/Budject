@@ -1,10 +1,16 @@
+
+/* Ensure page container is properly constrained */
 .asset-page {
     max-width: 1400px;
     margin: 0 auto;
+    padding: 0 var(--spacing-md);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .asset-header {
     margin-bottom: var(--spacing-xl);
+    width: 100%;
 }
 
 .asset-header h1 {
@@ -16,6 +22,7 @@
     display: flex;
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-lg);
+    width: 100%;
 }
 
 .asset-tab {
@@ -49,6 +56,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--spacing-lg);
+    width: 100%;
 }
 
 .asset-list-header h3 {
@@ -59,9 +67,10 @@
 .asset-grid {
     display: grid;
     gap: var(--spacing-lg);
-    /* Default: 1 column on mobile */
     grid-template-columns: 1fr;
     align-items: stretch;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* 2 columns on tablet */
