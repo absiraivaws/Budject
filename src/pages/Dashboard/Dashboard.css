@@ -54,6 +54,7 @@
     gap: var(--spacing-md);
     /* Default: 1 column on mobile */
     grid-template-columns: 1fr;
+    max-width: 100%;
 }
 
 /* 2 columns on tablet */
@@ -109,17 +110,25 @@
 
 .account-info {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .account-name {
     font-weight: var(--font-weight-semibold);
     margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .account-type {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
     text-transform: capitalize;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .account-balance {

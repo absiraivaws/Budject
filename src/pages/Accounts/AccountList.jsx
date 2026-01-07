@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import Card from '../../components/UI/Card.jsx';
 import Button from '../../components/UI/Button.jsx';
 import Modal from '../../components/UI/Modal.jsx';
@@ -7,11 +10,87 @@ import { getAllAccounts, addAccount, updateAccount, deleteAccount } from '../../
 import { formatCurrency } from '../../utils/currency.js';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
 import { ACCOUNT_TYPES } from '../../config/constants.js';
+import { useDragDropOrder } from '../../hooks/useDragDropOrder.js';
 import './AccountList.css';
+
+// Sortable Account Card Component
+function SortableAccountCard({ account, currency, onEdit, onDelete }) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id: account.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    const accountType = ACCOUNT_TYPES.find(t => t.id === account.type);
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            <Card className="account-card">
+                <div className="account-card-header">
+                    <div
+                        className="account-card-icon"
+                        style={{ background: account.color }}
+                    >
+                        {account.icon}
+                    </div>
+                    <div className="account-card-actions">
+                        <button
+                            className="account-action-btn"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onEdit(account);
+                            }}
+                            title="Edit"
+                        >
+                            ✏️
+                        </button>
+                        <button
+                            className="account-action-btn"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onDelete(account);
+                            }}
+                            title="Delete"
+                        >
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+
+                <div className="account-card-body">
+                    <h3 className="account-card-name">{account.name}</h3>
+                    <div className="account-card-type">
+                        {accountType?.icon} {accountType?.label}
+                    </div>
+                    <div className="account-card-balance">
+                        {formatCurrency(account.balance || 0, currency)}
+                    </div>
+                </div>
+            </Card>
+        </div>
+    );
+}
 
 export default function AccountList() {
     const { currency } = useCurrency();
     const [accounts, setAccounts] = useState([]);
+    const { orderedItems: orderedAccounts, handleDragEnd } = useDragDropOrder(accounts, 'accounts-order');
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        })
+    );
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingAccount, setEditingAccount] = useState(null);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
