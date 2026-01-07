@@ -55,12 +55,35 @@
     margin: 0;
 }
 
-/* Asset Grid */
+/* Asset Grid - Responsive (matches Accounts and Dashboard) */
 .asset-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--spacing-lg);
+    /* Default: 1 column on mobile */
+    grid-template-columns: 1fr;
 }
+
+/* 2 columns on tablet */
+@media (min-width: 768px) {
+    .asset-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 3 columns on desktop */
+@media (min-width: 1024px) {
+    .asset-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* 4 columns on large desktop */
+@media (min-width: 1440px) {
+    .asset-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
 
 .asset-item {
     display: flex;
