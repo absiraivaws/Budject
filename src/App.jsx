@@ -62,6 +62,29 @@ function App() {
     processRecurring();
   }, []);
 
+  // Prevent mouse wheel from incrementing/decrementing focused number inputs
+  useEffect(() => {
+    const handleWheel = () => {
+      const activeElement = document.activeElement;
+      if (!activeElement) return;
+
+      if (
+        activeElement instanceof HTMLInputElement &&
+        activeElement.type === 'number' &&
+        !activeElement.disabled &&
+        !activeElement.readOnly
+      ) {
+        activeElement.blur();
+      }
+    };
+
+    // Capture phase ensures we run before default number-input wheel behavior.
+    window.addEventListener('wheel', handleWheel, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener('wheel', handleWheel, { capture: true });
+    };
+  }, []);
+
   return (
     <ThemeProvider>
       <FontSizeProvider>
