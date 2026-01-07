@@ -283,15 +283,6 @@ export default function AssetManager() {
                                         <div className="asset-item-content">
                                             <div className="asset-item-name">{asset.name}</div>
                                             <div className="asset-item-type">{typeInfo.label}</div>
-                                            {linkedAccount && (
-                                                <div className="asset-item-linked">Linked: {linkedAccount}</div>
-                                            )}
-                                            {asset.notes && (
-                                                <div className="asset-item-notes">{asset.notes}</div>
-                                            )}
-                                            <div className="asset-item-date">
-                                                Added: {asset.purchase_date ? formatDate(asset.purchase_date, 'short') : 'N/A'}
-                                            </div>
                                         </div>
                                         <div className="asset-item-value">
                                             {formatCurrency(asset.current_value || asset.value, currency)}
