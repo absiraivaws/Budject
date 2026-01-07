@@ -180,21 +180,23 @@ export default function TransactionList() {
     };
 
     const getAccountName = (accountId) => {
+        if (!Array.isArray(accounts)) return 'Unknown';
         const account = accounts.find(a => a.id === accountId);
         return account ? `${account.icon} ${account.name}` : 'Unknown';
     };
 
     const getCategoryName = (categoryId) => {
+        if (!Array.isArray(categories)) return 'Unknown';
         const category = categories.find(c => c.id === categoryId);
         return category ? `${category.icon} ${category.name}` : 'Unknown';
     };
 
-    // Calculate stats
-    const stats = filteredTransactions.reduce((acc, tx) => {
+    // Calculate stats safely
+    const stats = Array.isArray(filteredTransactions) ? filteredTransactions.reduce((acc, tx) => {
         if (tx.type === TRANSACTION_TYPES.INCOME) acc.income += tx.amount;
         if (tx.type === TRANSACTION_TYPES.EXPENSE) acc.expense += tx.amount;
         return acc;
-    }, { income: 0, expense: 0 });
+    }, { income: 0, expense: 0 }) : { income: 0, expense: 0 };
 
     return (
         <div className="transactions-page fade-in">
@@ -279,7 +281,7 @@ export default function TransactionList() {
                             onChange={(e) => handleFilterChange('account', e.target.value)}
                         >
                             <option value="all">All Accounts</option>
-                            {accounts.map(account => (
+                            {Array.isArray(accounts) && accounts.map(account => (
                                 <option key={account.id} value={account.id}>
                                     {account.icon} {account.name}
                                 </option>
@@ -295,7 +297,7 @@ export default function TransactionList() {
                             onChange={(e) => handleFilterChange('category', e.target.value)}
                         >
                             <option value="all">All Categories</option>
-                            {categories.map(category => (
+                            {Array.isArray(categories) && categories.map(category => (
                                 <option key={category.id} value={category.id}>
                                     {category.icon} {category.name}
                                 </option>
@@ -339,8 +341,8 @@ export default function TransactionList() {
             </Card>
 
             {/* Transactions List */}
-            <Card title={`Transactions (${filteredTransactions.length})`}>
-                {filteredTransactions.length === 0 ? (
+            <Card title={`Transactions (${filteredTransactions?.length || 0})`}>
+                {(!filteredTransactions || filteredTransactions.length === 0) ? (
                     <div className="empty-state">
                         <div className="empty-icon">💳</div>
                         <h3>No transactions found</h3>
