@@ -160,7 +160,7 @@
   margin: 0;
   padding: 0;
   /* Allow text to wrap at word boundaries, not break every character */
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 html {

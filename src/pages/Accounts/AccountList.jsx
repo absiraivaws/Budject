@@ -35,45 +35,44 @@ function SortableAccountCard({ account, currency, onEdit, onDelete }) {
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
             <Card className="account-card">
-                <div className="account-card-header">
+                <div className="account-card-content">
                     <div
                         className="account-card-icon"
                         style={{ background: account.color }}
                     >
                         {account.icon}
                     </div>
-                    <div className="account-card-actions">
-                        <button
-                            className="account-action-btn"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onEdit(account);
-                            }}
-                            title="Edit"
-                        >
-                            ✏️
-                        </button>
-                        <button
-                            className="account-action-btn"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onDelete(account);
-                            }}
-                            title="Delete"
-                        >
-                            🗑️
-                        </button>
-                    </div>
-                </div>
-
-                <div className="account-card-body">
-                    <h3 className="account-card-name">{account.name}</h3>
-                    <div className="account-card-type">
-                        {accountType?.icon} {accountType?.label}
+                    <div className="account-card-info">
+                        <h3 className="account-card-name">{account.name}</h3>
+                        <div className="account-card-type">
+                            {accountType?.icon} {accountType?.label}
+                        </div>
                     </div>
                     <div className="account-card-balance">
                         {formatCurrency(account.balance || 0, currency)}
                     </div>
+                </div>
+                <div className="account-card-actions">
+                    <button
+                        className="account-action-btn"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit(account);
+                        }}
+                        title="Edit"
+                    >
+                        ✏️
+                    </button>
+                    <button
+                        className="account-action-btn"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(account);
+                        }}
+                        title="Delete"
+                    >
+                        🗑️
+                    </button>
                 </div>
             </Card>
         </div>
