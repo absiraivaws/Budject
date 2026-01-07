@@ -48,37 +48,44 @@
     font-weight: var(--font-weight-bold);
 }
 
-/* Accounts List - Responsive Grid */
-.accounts-list {
+/* Accounts Grid - Responsive (matches Accounts page) */
+.accounts-list,
+.accounts-grid {
     display: grid;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
     /* Default: 1 column on mobile */
     grid-template-columns: 1fr;
-    max-width: 100%;
 }
 
 /* 2 columns on tablet */
 @media (min-width: 768px) {
-    .accounts-list {
+
+    .accounts-list,
+    .accounts-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 /* 3 columns on desktop */
 @media (min-width: 1024px) {
-    .accounts-list {
+
+    .accounts-list,
+    .accounts-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
 /* 4 columns on large desktop */
 @media (min-width: 1440px) {
-    .accounts-list {
+
+    .accounts-list,
+    .accounts-grid {
         grid-template-columns: repeat(4, 1fr);
     }
 }
 
-.account-item {
+.account-item,
+.account-card {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
@@ -90,7 +97,8 @@
     box-shadow: var(--shadow-sm);
 }
 
-.account-item:hover {
+.account-item:hover,
+.account-card:hover {
     background: var(--color-surface-hover);
     transform: translateY(-2px);
     border-color: var(--color-primary);
