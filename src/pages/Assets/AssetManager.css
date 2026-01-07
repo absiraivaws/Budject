@@ -88,6 +88,7 @@
 
 .asset-item {
     display: flex;
+    align-items: center;
     gap: var(--spacing-md);
     padding: var(--spacing-lg);
     background: var(--color-surface);
@@ -95,7 +96,7 @@
     border: 2px solid var(--color-border);
     transition: all var(--transition-fast);
     box-shadow: var(--shadow-sm);
-    min-height: 150px;
+    min-height: 120px;
     height: 100%;
 }
 
@@ -129,25 +130,25 @@
 .asset-item-content {
     flex: 1;
     min-width: 0;
-    word-break: keep-all !important;
-    overflow-wrap: normal !important;
-    white-space: normal !important;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .asset-item-name {
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
-    margin-bottom: var(--spacing-xs);
-    word-break: keep-all !important;
-    overflow-wrap: normal !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .asset-item-type {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-xs);
-    word-break: keep-all !important;
-    overflow-wrap: normal !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .asset-item-linked {
@@ -270,7 +271,7 @@
 
     .asset-grid {
         grid-template-columns: 1fr;
-    align-items: stretch;
+        align-items: stretch;
     }
 }
 
