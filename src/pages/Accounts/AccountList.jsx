@@ -179,49 +179,28 @@ export default function AccountList() {
                     </div>
                 </Card>
             ) : (
-                <div className="accounts-grid">
-                    {accounts.map(account => {
-                        const accountType = ACCOUNT_TYPES.find(t => t.id === account.type);
-                        return (
-                            <Card key={account.id} className="account-card">
-                                <div className="account-card-header">
-                                    <div
-                                        className="account-card-icon"
-                                        style={{ background: account.color }}
-                                    >
-                                        {account.icon}
-                                    </div>
-                                    <div className="account-card-actions">
-                                        <button
-                                            className="account-action-btn"
-                                            onClick={() => handleEdit(account)}
-                                            title="Edit"
-                                        >
-                                            ✏️
-                                        </button>
-                                        <button
-                                            className="account-action-btn"
-                                            onClick={() => handleDelete(account)}
-                                            title="Delete"
-                                        >
-                                            🗑️
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="account-card-body">
-                                    <h3 className="account-card-name">{account.name}</h3>
-                                    <div className="account-card-type">
-                                        {accountType?.icon} {accountType?.label}
-                                    </div>
-                                    <div className="account-card-balance">
-                                        {formatCurrency(account.balance || 0, currency)}
-                                    </div>
-                                </div>
-                            </Card>
-                        );
-                    })}
-                </div>
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                >
+                    <SortableContext
+                        items={orderedAccounts.map(a => a.id)}
+                        strategy={verticalListSortingStrategy}
+                    >
+                        <div className="accounts-grid">
+                            {orderedAccounts.map(account => (
+                                <SortableAccountCard
+                                    key={account.id}
+                                    account={account}
+                                    currency={currency}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDelete}
+                                />
+                            ))}
+                        </div>
+                    </SortableContext>
+                </DndContext>
             )}
 
             {/* Add/Edit Modal */}
