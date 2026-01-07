@@ -61,6 +61,7 @@
     gap: var(--spacing-lg);
     /* Default: 1 column on mobile */
     grid-template-columns: 1fr;
+    align-items: stretch;
 }
 
 /* 2 columns on tablet */
@@ -94,6 +95,8 @@
     border: 2px solid var(--color-border);
     transition: all var(--transition-fast);
     box-shadow: var(--shadow-sm);
+    min-height: 150px;
+    height: 100%;
 }
 
 .asset-item:hover {
@@ -267,6 +270,7 @@
 
     .asset-grid {
         grid-template-columns: 1fr;
+    align-items: stretch;
     }
 }
 

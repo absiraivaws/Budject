@@ -55,6 +55,8 @@
     gap: var(--spacing-lg);
     /* Default: 1 column on mobile */
     grid-template-columns: 1fr;
+    align-items: stretch;
+    /* Make all cards same height */
 }
 
 /* 2 columns on tablet */
@@ -87,14 +89,18 @@
 .account-item,
 .account-card {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: var(--spacing-md);
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
     background: var(--color-surface);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
     border: 2px solid var(--color-border);
     box-shadow: var(--shadow-sm);
+    min-height: 120px;
+    /* Ensure consistent minimum height */
+    height: 100%;
+    /* Stretch to fill grid cell */
 }
 
 .account-item:hover,
@@ -142,7 +148,9 @@
 .account-balance {
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
-}
+
+    white-space: nowrap;
+    margin-top: auto;}
 
 /* Transactions List */
 .transactions-list {

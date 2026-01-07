@@ -78,6 +78,7 @@
     gap: var(--spacing-lg);
     /* Default: 1 column on mobile */
     grid-template-columns: 1fr;
+    align-items: stretch;
 }
 
 /* 2 columns on tablet */
@@ -105,6 +106,8 @@
     transition: all var(--transition-base);
     border: 2px solid var(--color-border);
     box-shadow: var(--shadow-sm);
+    min-height: 180px;
+    height: 100%;
 }
 
 .account-card:hover {
@@ -174,7 +177,8 @@
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-primary);
-}
+
+    white-space: nowrap;}
 
 /* Empty State */
 .empty-state {
@@ -223,5 +227,6 @@
 
     .accounts-grid {
         grid-template-columns: 1fr;
+    align-items: stretch;
     }
 }
