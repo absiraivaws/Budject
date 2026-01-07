@@ -280,11 +280,11 @@ export default function AssetManager() {
                                 return (
                                     <div key={asset.id} className="asset-item">
                                         <div className="asset-item-icon">{typeInfo.icon}</div>
-                                        <div className="asset-item-content">
+                                        <div className="asset-item-info">
                                             <div className="asset-item-name">{asset.name}</div>
                                             <div className="asset-item-type">{typeInfo.label}</div>
                                         </div>
-                                        <div className="asset-item-value">
+                                        <div className="asset-item-balance">
                                             {formatCurrency(asset.current_value || asset.value, currency)}
                                         </div>
                                     </div>
@@ -320,20 +320,11 @@ export default function AssetManager() {
                                 return (
                                     <div key={liability.id} className="asset-item liability">
                                         <div className="asset-item-icon">{typeInfo.icon}</div>
-                                        <div className="asset-item-content">
+                                        <div className="asset-item-info">
                                             <div className="asset-item-name">{liability.name}</div>
                                             <div className="asset-item-type">{typeInfo.label}</div>
-                                            {linkedAccount && (
-                                                <div className="asset-item-linked">Linked: {linkedAccount}</div>
-                                            )}
-                                            {liability.notes && (
-                                                <div className="asset-item-notes">{liability.notes}</div>
-                                            )}
-                                            <div className="asset-item-date">
-                                                Added: {liability.purchase_date ? formatDate(liability.purchase_date, 'short') : 'N/A'}
-                                            </div>
                                         </div>
-                                        <div className="asset-item-value text-danger">
+                                        <div className="asset-item-balance text-danger">
                                             {formatCurrency(liability.current_value || liability.value, currency)}
                                         </div>
                                     </div>
