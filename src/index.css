@@ -37,10 +37,11 @@
   --color-border-light: hsl(0, 0%, 94%);
 
   /* Income & Expense Colors */
-  --color-income: hsl(142, 76%, 36%);
-  --color-income-light: hsl(142, 76%, 95%);
-  --color-expense: hsl(0, 84%, 60%);
-  --color-expense-light: hsl(0, 84%, 96%);
+  /* Income & Expense Colors - Brighter */
+  --color-income: hsl(142, 70%, 45%);
+  --color-income-light: hsl(142, 70%, 96%);
+  --color-expense: hsl(0, 85%, 65%);
+  --color-expense-light: hsl(0, 85%, 97%);
   --color-transfer: hsl(199, 89%, 48%);
   --color-transfer-light: hsl(199, 89%, 96%);
 
@@ -137,10 +138,10 @@
   --color-border: hsl(240, 10%, 20%);
   --color-border-light: hsl(240, 10%, 16%);
 
-  --color-income: hsl(142, 76%, 46%);
-  --color-income-light: hsl(142, 76%, 15%);
-  --color-expense: hsl(0, 84%, 70%);
-  --color-expense-light: hsl(0, 84%, 15%);
+  --color-income: hsl(142, 70%, 55%);
+  --color-income-light: hsl(142, 70%, 15%);
+  --color-expense: hsl(0, 85%, 75%);
+  --color-expense-light: hsl(0, 85%, 15%);
   --color-transfer: hsl(199, 89%, 58%);
   --color-transfer-light: hsl(199, 89%, 15%);
 

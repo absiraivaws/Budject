@@ -9,6 +9,7 @@ import { DataProvider } from './context/DataContext.jsx';
 
 import ProtectedRoute from './components/Auth/ProtectedRoute.jsx';
 import ResponsiveLayout from './components/Layout/ResponsiveLayout.jsx';
+import ErrorBoundary from './components/UI/ErrorBoundary.jsx';
 
 import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx';
@@ -94,98 +95,100 @@ function App() {
             <ReminderProvider>
               <DataProvider>
                 <Router>
-                  <Routes>
-                    {/* Public Routes */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <ErrorBoundary>
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
 
-                    {/* Protected Routes */}
-                    <Route path="/" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <Dashboard />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/transactions" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <TransactionList />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/accounts" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <AccountList />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/categories" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <CategoryManager />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/budgets" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <BudgetManager />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/calendar" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <CalendarView />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/recurring" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <RecurringManager />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/reports" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <ReportsHub />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/assets" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <AssetManager />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/friends" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <FriendManager />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/settings" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <Settings />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/profile" element={
-                      <ProtectedRoute>
-                        <ResponsiveLayout>
-                          <Profile />
-                        </ResponsiveLayout>
-                      </ProtectedRoute>
-                    } />
-                  </Routes>
+                      {/* Protected Routes */}
+                      <Route path="/" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <Dashboard />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/transactions" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <TransactionList />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/accounts" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <AccountList />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/categories" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <CategoryManager />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/budgets" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <BudgetManager />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/calendar" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <CalendarView />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/recurring" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <RecurringManager />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/reports" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <ReportsHub />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/assets" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <AssetManager />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/friends" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <FriendManager />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/settings" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <Settings />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/profile" element={
+                        <ProtectedRoute>
+                          <ResponsiveLayout>
+                            <Profile />
+                          </ResponsiveLayout>
+                        </ProtectedRoute>
+                      } />
+                    </Routes>
+                  </ErrorBoundary>
                 </Router>
               </DataProvider>
             </ReminderProvider>

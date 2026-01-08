@@ -8,8 +8,9 @@ import { CURRENCIES } from '../config/constants.js';
  * @returns {string} Formatted amount
  */
 export function formatCurrency(amount, currencyCode = 'LKR', compact = false) {
+    if (amount === undefined || amount === null || isNaN(amount)) return '0.00';
     const currency = CURRENCIES.find(c => c.code === currencyCode);
-    if (!currency) return `${amount.toFixed(2)}`;
+    if (!currency) return `${Number(amount).toFixed(2)}`;
 
     let formattedAmount;
     if (compact && Math.abs(amount) >= 1000) {

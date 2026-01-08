@@ -157,3 +157,13 @@
     z-index: 999;
     backdrop-filter: blur(2px);
 }
+
+/* Fix SideNav visibility in mobile sidebar */
+.mobile-sidebar .side-nav {
+    display: flex;
+    width: 100%;
+    height: auto;
+    border: none;
+    position: static;
+    background: var(--color-surface);
+}
