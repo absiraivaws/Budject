@@ -47,8 +47,8 @@ export default function Register() {
             return;
         }
 
-        if (formData.password.length < 6) {
-            setError('Password must be at least 6 characters');
+        if (!/^\d{6}$/.test(formData.password)) {
+            setError('Password must be exactly a 6-digit number (e.g., 123456)');
             return;
         }
 
@@ -126,7 +126,7 @@ export default function Register() {
                         <input
                             type="password"
                             className="form-input"
-                            placeholder="At least 6 characters"
+                            placeholder="6-digit PIN (e.g., 123456)"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             disabled={loading}

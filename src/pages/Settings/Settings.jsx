@@ -99,36 +99,7 @@ export default function Settings() {
         localStorage.setItem('budgetRollover', JSON.stringify(value));
     };
 
-    // Referrals
-    const [referralsCount, setReferralsCount] = useState(0);
-    const [copied, setCopied] = useState(false);
 
-    useEffect(() => {
-        let mounted = true;
-        async function fetchProfile() {
-            try {
-                const profile = await getUserRoot();
-                if (!mounted) return;
-                setReferralsCount(profile?.referrals || 0);
-            } catch (err) {
-                console.error('Failed to fetch user root:', err);
-            }
-        }
-        fetchProfile();
-        return () => { mounted = false; };
-    }, []);
-
-    const referralLink = user ? `${window.location.origin}/register?ref=${user.id}` : '';
-
-    const handleCopyLink = async () => {
-        try {
-            await navigator.clipboard.writeText(referralLink);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
-            console.error('Copy failed', err);
-        }
-    };
 
     const handleReminderToggle = (e) => {
         const newSettings = {
@@ -264,28 +235,7 @@ export default function Settings() {
                 </div>
             </Card>
 
-            {/* Referrals */}
-            <Card title="Referrals">
-                <div className="settings-section">
-                    <div>
-                        <div className="setting-info">
-                            <div className="setting-label">Your Referral Link</div>
-                            <div className="setting-description">
-                                Share this link to invite friends. When they sign up using it, they'll be marked as referred and your referrals count will increase.
-                            </div>
-                        </div>
-                        <div className="referral-controls">
-                            <div className="referral-row">
-                                <div className="referral-link" title={referralLink}>{referralLink}</div>
-                                <div className="referral-actions">
-                                    <Button variant="primary" onClick={handleCopyLink}>{copied ? 'Copied' : 'Copy Link'}</Button>
-                                </div>
-                            </div>
-                            <div className="referral-count">Referrals: <strong>{referralsCount}</strong></div>
-                        </div>
-                    </div>
-                </div>
-            </Card>
+
 
             {/* Reminders */}
             <Card title="Daily Reminders">

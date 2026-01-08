@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDeviceType } from '../../hooks/useMediaQuery.js';
 import BottomNav from '../Navigation/BottomNav.jsx';
 import SideNav from '../Navigation/SideNav.jsx';
@@ -12,11 +13,14 @@ import {
     openWhatsAppLink
 } from '../../services/whatsappLinkService.js';
 import { useCurrency } from '../../context/CurrencyContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import './ResponsiveLayout.css';
 import ThemeToggle from '../UI/ThemeToggle.jsx';
 
 export default function ResponsiveLayout({ children }) {
     const deviceType = useDeviceType();
+    const navigate = useNavigate();
+    const { user } = useAuth();
     const { currency } = useCurrency();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [showReminderPopup, setShowReminderPopup] = useState(false);
@@ -92,19 +96,41 @@ export default function ResponsiveLayout({ children }) {
         setShowReminderPopup(false);
     };
 
+    const handleProfileClick = () => {
+        navigate('/profile');
+    };
+
     return (
         <div className={`app-layout device-${deviceType}`}>
-            {/* <ThemeToggle /> */}
-            {/* Hamburger Menu Button - Only on Mobile */}
-            {deviceType === 'mobile' && (
-                <button
-                    className="hamburger-menu"
-                    onClick={toggleSidebar}
-                    aria-label="Toggle menu"
-                >
-                    <span className="hamburger-icon">☰</span>
-                </button>
-            )}
+            {/* Top Header */}
+            <header className="app-header">
+                <div className="header-left">
+                    {/* Hamburger Menu Button - Only on Mobile */}
+                    {deviceType === 'mobile' && (
+                        <button
+                            className="hamburger-menu"
+                            onClick={toggleSidebar}
+                            aria-label="Toggle menu"
+                        >
+                            <span className="hamburger-icon">☰</span>
+                        </button>
+                    )}
+                </div>
+
+                <div className="header-center">
+                    {user && <span className="user-greeting">Hi-{user.displayName || 'User'}</span>}
+                </div>
+
+                <div className="header-right">
+                    <button
+                        className="profile-icon-btn"
+                        onClick={handleProfileClick}
+                        aria-label="Profile"
+                    >
+                        👤
+                    </button>
+                </div>
+            </header>
 
             {/* Overlay - Only on Mobile when sidebar is open */}
             {deviceType === 'mobile' && isSidebarOpen && (
@@ -149,3 +175,4 @@ export default function ResponsiveLayout({ children }) {
         </div>
     );
 }
+

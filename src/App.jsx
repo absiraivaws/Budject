@@ -24,6 +24,7 @@ import ReportsHub from './pages/Reports/ReportsHub.jsx';
 import AssetManager from './pages/Assets/AssetManager.jsx';
 import FriendManager from './pages/Friends/FriendManager.jsx';
 import Settings from './pages/Settings/Settings.jsx';
+import Profile from './pages/Profile/Profile.jsx';
 
 import { initDB } from './services/db.js';
 import { initializeTheme } from './services/storageService.js';
@@ -174,6 +175,13 @@ function App() {
                       <ProtectedRoute>
                         <ResponsiveLayout>
                           <Settings />
+                        </ResponsiveLayout>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/profile" element={
+                      <ProtectedRoute>
+                        <ResponsiveLayout>
+                          <Profile />
                         </ResponsiveLayout>
                       </ProtectedRoute>
                     } />

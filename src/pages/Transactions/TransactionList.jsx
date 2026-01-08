@@ -40,7 +40,9 @@ export default function TransactionList() {
     // We don't need loadData anymore, data comes from context
     // Just apply filters when data or filters change
     useEffect(() => {
-        applyFilters();
+        if (transactions) {
+            applyFilters();
+        }
     }, [transactions, filters]);
 
     // Handle URL parameters for filtering
@@ -55,8 +57,8 @@ export default function TransactionList() {
     function applyFilters() {
         try {
             // Safety check for transactions array
-            if (!Array.isArray(transactions)) {
-                console.warn('Transactions is not an array:', transactions);
+            if (!transactions || !Array.isArray(transactions)) {
+                // console.warn('Transactions is not an array:', transactions);
                 setFilteredTransactions([]);
                 return;
             }
@@ -202,6 +204,8 @@ export default function TransactionList() {
         if (tx.type === TRANSACTION_TYPES.EXPENSE) acc.expense += tx.amount;
         return acc;
     }, { income: 0, expense: 0 }) : { income: 0, expense: 0 };
+
+    if (!transactions && !filteredTransactions) return <div className="p-4">Loading transactions...</div>;
 
     return (
         <div className="transactions-page fade-in">

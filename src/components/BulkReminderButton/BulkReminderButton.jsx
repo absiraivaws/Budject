@@ -13,7 +13,7 @@ import './BulkReminderButton.css';
 export default function BulkReminderButton({ friends, onReminderSent }) {
     const { currency } = useCurrency();
     const [showModal, setShowModal] = useState(false);
-    const [sendingIndex, setSendingIndex] = useState(-1);
+    const [sentReminders, setSentReminders] = useState({}); // Track sent status by friend ID
 
     // Get friends with outstanding balances and WhatsApp numbers
     const friendsToRemind = friends.filter(f =>
@@ -23,16 +23,18 @@ export default function BulkReminderButton({ friends, onReminderSent }) {
     const lendingReminders = friendsToRemind.filter(f => f.balance > 0);
     const borrowingReminders = friendsToRemind.filter(f => f.balance < 0);
 
-    const handleSendAll = () => {
+    const handleOpenModal = () => {
         if (friendsToRemind.length === 0) {
             alert('No friends with WhatsApp numbers and outstanding balances.');
             return;
         }
+        setSentReminders({}); // Reset sent state on open
         setShowModal(true);
     };
 
-    const handleSendReminder = async (friend, index) => {
-        setSendingIndex(index);
+    const handleSendReminder = async (friend) => {
+        // Mark as sent immediately to disable button
+        setSentReminders(prev => ({ ...prev, [friend.id]: true }));
 
         const isLending = friend.balance > 0;
         const amount = Math.abs(friend.balance);
@@ -61,28 +63,34 @@ export default function BulkReminderButton({ friends, onReminderSent }) {
         if (onReminderSent) {
             await onReminderSent(friend);
         }
-
-        // Wait a bit before next one
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setSendingIndex(-1);
-    };
-
-    const handleSendAllSequentially = async () => {
-        for (let i = 0; i < friendsToRemind.length; i++) {
-            await handleSendReminder(friendsToRemind[i], i);
-        }
-        setShowModal(false);
     };
 
     if (friendsToRemind.length === 0) {
         return null;
     }
 
+    const ReminderItem = ({ friend }) => (
+        <li key={friend.id} className={sentReminders[friend.id] ? 'sent' : ''}>
+            <div className="reminder-info">
+                <span className="friend-name">{friend.name}</span>
+                <span className="friend-amount">{formatCurrency(Math.abs(friend.balance), currency)}</span>
+            </div>
+            <Button
+                variant={sentReminders[friend.id] ? "secondary" : "success"}
+                size="sm"
+                onClick={() => handleSendReminder(friend)}
+                disabled={sentReminders[friend.id]}
+            >
+                {sentReminders[friend.id] ? 'Sent' : 'WhatsApp'}
+            </Button>
+        </li>
+    );
+
     return (
         <>
             <Button
                 variant="success"
-                onClick={handleSendAll}
+                onClick={handleOpenModal}
                 style={{ fontSize: '1rem', padding: '0.75rem 1.5rem' }}
             >
                 📱 Send All Reminders ({friendsToRemind.length})
@@ -91,23 +99,20 @@ export default function BulkReminderButton({ friends, onReminderSent }) {
             <Modal
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}
-                title="📱 Send All WhatsApp Reminders"
+                title="📱 Send WhatsApp Reminders"
                 size="md"
             >
                 <div className="bulk-reminder-modal">
                     <p className="bulk-reminder-intro">
-                        Ready to send {friendsToRemind.length} reminder{friendsToRemind.length > 1 ? 's' : ''}?
+                        Send reminders individually to your friends.
                     </p>
 
                     {lendingReminders.length > 0 && (
                         <div className="reminder-section">
                             <h4>💸 Money You Lent ({lendingReminders.length})</h4>
                             <ul className="reminder-list">
-                                {lendingReminders.map((friend, idx) => (
-                                    <li key={friend.id} className={sendingIndex === idx ? 'sending' : ''}>
-                                        {friend.name} - {formatCurrency(friend.balance, currency)}
-                                        {sendingIndex === idx && <span className="sending-indicator"> ⏳ Sending...</span>}
-                                    </li>
+                                {lendingReminders.map(friend => (
+                                    <ReminderItem key={friend.id} friend={friend} />
                                 ))}
                             </ul>
                         </div>
@@ -117,31 +122,20 @@ export default function BulkReminderButton({ friends, onReminderSent }) {
                         <div className="reminder-section">
                             <h4>💰 Money You Borrowed ({borrowingReminders.length})</h4>
                             <ul className="reminder-list">
-                                {borrowingReminders.map((friend, idx) => (
-                                    <li key={friend.id} className={sendingIndex === (lendingReminders.length + idx) ? 'sending' : ''}>
-                                        {friend.name} - {formatCurrency(Math.abs(friend.balance), currency)}
-                                        {sendingIndex === (lendingReminders.length + idx) && <span className="sending-indicator"> ⏳ Sending...</span>}
-                                    </li>
+                                {borrowingReminders.map(friend => (
+                                    <ReminderItem key={friend.id} friend={friend} />
                                 ))}
                             </ul>
                         </div>
                     )}
 
                     <div className="bulk-reminder-note">
-                        <p>⚠️ <strong>Note:</strong> Each reminder will open in a new WhatsApp tab. You'll need to click "Send" in each tab.</p>
-                        <p>💡 <strong>Tip:</strong> WhatsApp tabs will open one by one with a 1-second delay.</p>
+                        <p>⚠️ <strong>Note:</strong> Clicking "WhatsApp" will open a new tab. You must click "Send" in WhatsApp yourself.</p>
                     </div>
 
                     <div className="modal-footer">
                         <Button variant="secondary" onClick={() => setShowModal(false)}>
-                            Cancel
-                        </Button>
-                        <Button
-                            variant="success"
-                            onClick={handleSendAllSequentially}
-                            disabled={sendingIndex >= 0}
-                        >
-                            {sendingIndex >= 0 ? 'Sending...' : `Send All ${friendsToRemind.length} Reminders`}
+                            Close
                         </Button>
                     </div>
                 </div>

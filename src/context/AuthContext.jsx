@@ -95,6 +95,13 @@ export function AuthProvider({ children }) {
         await sendPasswordResetEmail(auth, email);
     };
 
+    const updateUserProfile = async (updates) => {
+        if (auth.currentUser) {
+            await updateProfile(auth.currentUser, updates);
+            setUser(prev => ({ ...prev, ...updates }));
+        }
+    };
+
     const value = {
         user,
         loading,
@@ -102,7 +109,8 @@ export function AuthProvider({ children }) {
         register,
         login,
         logout,
-        resetPassword
+        resetPassword,
+        updateUserProfile
     };
 
     return (

@@ -86,7 +86,7 @@ export default function Login() {
                         <input
                             type="password"
                             className="form-input"
-                            placeholder="Enter your password"
+                            placeholder="Enter your 6-digit PIN"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             disabled={loading}

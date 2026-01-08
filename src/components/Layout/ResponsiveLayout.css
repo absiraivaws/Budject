@@ -1,181 +1,159 @@
-.device-mobile .main-content {
-    padding-bottom: calc(60px + var(--spacing-lg));
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    flex-direction: column;
+    /* Changed to column to accommodate header */
 }
 
-.device-tablet .main-content,
-.device-desktop .main-content {
-    padding: var(--spacing-xl);
+/* Header Styles */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-@media (max-width: 767px) {
-    .main-content {
-        padding: var(--spacing-md);
-    }
+.header-left,
+.header-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
 }
 
-/* ========================================
-   HAMBURGER MENU BUTTON
-   ======================================== */
+.header-right {
+    justify-content: flex-end;
+}
 
-.hamburger-menu {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    z-index: 1102;
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: var(--primary-color);
+.header-center {
+    flex: 2;
+    text-align: center;
+}
+
+.user-greeting {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+}
+
+.profile-icon-btn {
+    background: none;
     border: none;
+    font-size: 1.5rem;
     cursor: pointer;
+    padding: var(--spacing-xs);
+    border-radius: 50%;
+    transition: background-color 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
 }
 
-.hamburger-menu:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+.profile-icon-btn:hover {
+    background-color: var(--bg-hover);
 }
 
-.hamburger-menu:active {
-    transform: scale(0.95);
+.hamburger-menu {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    padding: var(--spacing-xs);
 }
 
-.hamburger-icon {
-    font-size: 24px;
-    color: white;
-    line-height: 1;
+/* Layout adjustments for header */
+.device-desktop,
+.device-tablet {
+    flex-direction: row;
+    /* Sidebar side-by-side */
+    flex-wrap: wrap;
+    /* Allow wrapping */
 }
 
-/* ========================================
-   MOBILE SIDEBAR
-   ======================================== */
+.device-desktop .app-header,
+.device-tablet .app-header {
+    width: 100%;
+    order: 1;
+}
 
+.device-desktop .side-nav,
+.device-tablet .side-nav {
+    order: 2;
+    height: calc(100vh - 60px);
+    /* Adjust for header height */
+    position: sticky;
+    top: 60px;
+}
+
+.device-desktop .main-content,
+.device-tablet .main-content {
+    order: 3;
+    flex: 1;
+    /* max-width: calc(100% - 250px);  Adjust based on sidebar width if needed */
+}
+
+.main-content {
+    flex: 1;
+    padding: var(--spacing-md);
+    overflow-y: auto;
+    /* padding-bottom: 80px;  Space for bottom nav on mobile */
+}
+
+.device-mobile .main-content {
+    padding-bottom: 80px;
+}
+
+/* Mobile Sidebar */
 .mobile-sidebar {
     position: fixed;
     top: 0;
-    left: -280px;
+    left: 0;
     width: 280px;
-    height: 100vh;
-    height: 100dvh;
-    /* Use dynamic viewport height for better mobile support */
-    background: var(--color-surface);
-    z-index: 1101;
-    transition: transform 0.3s ease;
-    transform: translateX(0);
-    overflow-y: auto;
-    overflow-x: hidden;
-    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
-    -webkit-overflow-scrolling: touch;
-    /* Smooth scrolling on iOS */
+    height: 100%;
+    background-color: var(--bg-secondary);
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
 }
 
 .mobile-sidebar.open {
-    transform: translateX(280px);
+    transform: translateX(0);
 }
 
 .mobile-sidebar-header {
+    padding: var(--spacing-md);
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 20px;
+    align-items: center;
     border-bottom: 1px solid var(--border-color);
-    background: var(--primary-color);
-    color: white;
-}
-
-.mobile-sidebar-header h2 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 600;
 }
 
 .close-sidebar {
-    background: transparent;
+    background: none;
     border: none;
-    color: white;
-    font-size: 28px;
+    font-size: 1.5rem;
     cursor: pointer;
-    padding: 4px 8px;
-    line-height: 1;
-    transition: transform 0.2s ease;
+    color: var(--text-secondary);
 }
-
-.close-sidebar:hover {
-    transform: scale(1.1);
-}
-
-.close-sidebar:active {
-    transform: scale(0.9);
-}
-
-/* ========================================
-   SIDEBAR OVERLAY
-   ======================================== */
 
 .sidebar-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
-    /* Use dynamic viewport height */
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1100;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-/* ========================================
-   RESPONSIVE ADJUSTMENTS
-   ======================================== */
-
-/* Show SideNav inside mobile sidebar */
-.mobile-sidebar .side-nav {
-    display: flex !important;
     width: 100%;
-    height: calc(100% - 61px);
-    /* Account for mobile-sidebar-header */
-    border-right: none;
-    position: static;
-    background: transparent;
-    overflow-y: auto;
-}
-
-/* Hide the duplicate header in mobile sidebar */
-.mobile-sidebar .side-nav-header {
-    display: none;
-}
-
-@media (max-width: 767px) {
-
-    /* Adjust main content padding when hamburger menu is visible */
-    .device-mobile .main-content {
-        padding-top: calc(var(--spacing-md) + 64px);
-    }
-}
-
-/* Tablet and Desktop - Hide mobile menu elements */
-@media (min-width: 768px) {
-
-    .hamburger-menu,
-    .mobile-sidebar,
-    .sidebar-overlay {
-        display: none !important;
-    }
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(2px);
 }
