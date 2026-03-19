@@ -1,0 +1,9 @@
+{
+  "appId": "app.b2u.spendex",
+  "appName": "SpendeX",
+  "webDir": "dist",
+  "server": {
+    "url": "https://spendex.b2u.app",
+    "androidScheme": "https"
+  }
+}
